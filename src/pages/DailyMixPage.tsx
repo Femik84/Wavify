@@ -15,7 +15,7 @@ import { useTheme } from "../contexts/ThemeContext";
 export default function DailyMixPage() {
   const navigate = useNavigate();
   const { mixId } = useParams<{ mixId: string }>();
-  const { isDark, setTheme } = useTheme();
+  const { isDark} = useTheme();
 
   const [currentMix, setCurrentMix] = useState<Playlist | null>(null);
   const [mixSongs, setMixSongs] = useState<Song[]>([]);
@@ -134,7 +134,6 @@ export default function DailyMixPage() {
     );
   }
 
-  const setIsDark = (v: boolean) => setTheme(v ? "dark" : "light");
 
   const bgColor = isDark ? "bg-black" : "bg-gray-50";
   const cardBg = isDark ? "bg-zinc-900" : "bg-white";
@@ -193,7 +192,7 @@ export default function DailyMixPage() {
           {/* Mix header */}
           <div className="max-w-7xl mx-auto px-6 pt-20 pb-8">
             <div className="flex flex-col items-center gap-6">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <img
                   src={currentMix.image}
                   alt={currentMix.name}
@@ -270,7 +269,7 @@ export default function DailyMixPage() {
                     <img
                       src={song.cover}
                       alt={song.title}
-                      className="w-12 h-12 rounded-lg object-cover shadow-md flex-shrink-0"
+                      className="w-12 h-12 rounded-lg object-cover shadow-md shrink-0"
                     />
                     <div className="min-w-0 flex-1">
                       <h4 className={`font-semibold truncate ${isCurrentSong ? "text-red-600" : ""}`}>
@@ -342,7 +341,7 @@ export default function DailyMixPage() {
                       <img
                         src={song.cover}
                         alt={song.title}
-                        className="w-14 h-14 rounded-lg object-cover shadow-md flex-shrink-0"
+                        className="w-14 h-14 rounded-lg object-cover shadow-md shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <h4 className={`font-semibold truncate ${isCurrentSong ? "text-red-600" : ""}`}>
@@ -386,7 +385,7 @@ export default function DailyMixPage() {
             >
               <div className="px-8 pt-6 pb-4">
                 <div className="flex items-end gap-4">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     <img
                       src={currentMix.image}
                       alt={currentMix.name}

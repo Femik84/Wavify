@@ -122,7 +122,7 @@ export default function NowPlaying() {
   }
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-gradient-to-b from-gray-900 via-gray-900 to-black" : "bg-gradient-to-b from-gray-100 via-white to-gray-50"}`}>
+    <div className={`min-h-screen ${isDark ? "bg-linear-to-b from-gray-900 via-gray-900 to-black" : "bg-linear-to-b from-gray-100 via-white to-gray-50"}`}>
       <div className="relative h-screen flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 z-10">
@@ -264,7 +264,7 @@ export default function NowPlaying() {
 
           {/* Volume Control */}
           <div className="flex items-center gap-3 max-w-md mx-auto pt-2">
-            <Volume2 className={`w-5 h-5 flex-shrink-0 ${isDark ? "text-gray-400" : "text-gray-600"}`} />
+            <Volume2 className={`w-5 h-5 shrink-0 ${isDark ? "text-gray-400" : "text-gray-600"}`} />
             <input 
               type="range" 
               min={0} 

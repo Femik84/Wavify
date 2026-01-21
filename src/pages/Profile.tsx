@@ -39,7 +39,7 @@ const CarouselCard: React.FC<CarouselCardProps> = ({ item, type, isDark, onClick
 
   return (
     <div
-      className="flex-shrink-0 w-32 sm:w-36 transition-transform duration-300 hover:scale-105 cursor-pointer"
+      className="shrink-0 w-32 sm:w-36 transition-transform duration-300 hover:scale-105 cursor-pointer"
       onClick={onClick}
     >
       <div className={`${isRounded} overflow-hidden mb-3 shadow-lg ${cardBg}`}>
@@ -163,7 +163,7 @@ const ListItem: React.FC<ListItemProps> = ({ item, index, type, isDark, hoveredC
       className={`flex items-center gap-4 p-3 rounded-lg ${cardHoverBg} transition-all duration-300 cursor-pointer group`}
     >
       <div className={`text-lg font-bold w-8 ${textSecondary} hidden lg:block`}>{index + 1}</div>
-      <div className={`w-14 h-14 ${isRounded} overflow-hidden flex-shrink-0 shadow-md`}>
+      <div className={`w-14 h-14 ${isRounded} overflow-hidden shrink-0 shadow-md`}>
         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
       </div>
       <div className="flex-1 min-w-0">
@@ -172,7 +172,7 @@ const ListItem: React.FC<ListItemProps> = ({ item, index, type, isDark, hoveredC
       </div>
       <button
         aria-label={`Open ${item.name}`}
-        className={`bg-red-600 rounded-full p-2 transition-all duration-300 flex-shrink-0 ${
+        className={`bg-red-600 rounded-full p-2 transition-all duration-300 shrink-0 ${
           hoveredCard === itemId ? "opacity-100 scale-100" : "md:opacity-0 md:scale-75 opacity-100 scale-100"
         } hover:bg-red-700`}
         onClick={(e) => {
@@ -393,7 +393,7 @@ export default function Profile() {
         <section className="space-y-6 relative">
           <button
             onClick={handleLogout}
-            className="absolute -top-3 -right-3 md:top-0 md:right-0 flex items-center justify-center gap-2 p-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 group border border-red-500/30"
+            className="absolute -top-3 -right-3 md:top-0 md:right-0 flex items-center justify-center gap-2 p-2.5 rounded-xl bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 group border border-red-500/30"
             aria-label="Logout"
           >
             <LogOut size={18} />
@@ -487,7 +487,7 @@ export default function Profile() {
                 </div>
 
                 <div className="mt-6">
-                  <button onClick={handleLogout} className={`w-xs flex relative left-6 justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 border border-red-500/30`}>
+                  <button onClick={handleLogout} className={`w-xs flex relative left-6 justify-center gap-2 px-4 py-3 rounded-xl bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 border border-red-500/30`}>
                     <LogOut size={18} />
                     <span className="font-semibold tracking-wide">Logout</span>
                   </button>
@@ -499,7 +499,7 @@ export default function Profile() {
                 <h2 className={`text-xl font-bold ${textPrimary} mb-3 text-center`}>Edit Profile</h2>
                 
                 <form onSubmit={handleEditSubmit} className="flex-1 flex flex-col justify-between min-h-0">
-                  <div className="space-y-3 flex-shrink-0">
+                  <div className="space-y-3 shrink-0">
                     {/* Profile Image */}
                     <div className="flex flex-col items-center">
                       <div className="relative">
@@ -561,7 +561,7 @@ export default function Profile() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-3 mt-3 flex-shrink-0">
+                  <div className="flex gap-3 mt-3 shrink-0">
                     <button
                       type="button"
                       onClick={handleCancelEdit}
@@ -575,7 +575,7 @@ export default function Profile() {
                     <button
                       type="submit"
                       disabled={isUpdating}
-                      className={`flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold transition-all shadow-lg hover:shadow-xl text-sm ${
+                      className={`flex-1 px-4 py-2.5 rounded-lg bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold transition-all shadow-lg hover:shadow-xl text-sm ${
                         isUpdating ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                     >

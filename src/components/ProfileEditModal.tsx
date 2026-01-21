@@ -106,7 +106,7 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute bottom-0 right-0 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-full p-2.5 shadow-lg transition-all duration-300 hover:scale-110 border-2 border-white dark:border-gray-900"
+                  className="absolute bottom-0 right-0 bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-full p-2.5 shadow-lg transition-all duration-300 hover:scale-110 border-2 border-white dark:border-gray-900"
                   aria-label="Upload image"
                 >
                   <Upload size={14} className="text-white" />
@@ -172,7 +172,7 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
             <button
               onClick={handleSubmit}
               disabled={isUpdating}
-              className={`flex-1 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] ${
+              className={`flex-1 px-5 py-2.5 rounded-xl bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] ${
                 isUpdating ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >

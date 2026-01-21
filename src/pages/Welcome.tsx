@@ -47,7 +47,7 @@ export default function WavifyWelcome() {
   }, []);
 
   return (
-    <div className="w-full bg-gradient-to-br from-white via-red-50 to-red-100 text-gray-900">
+    <div className="w-full bg-linear-to-br from-white via-red-50 to-red-100 text-gray-900">
       {/* Subtle grain texture overlay */}
       <div className="fixed inset-0 opacity-[0.02] pointer-events-none" 
            style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' /%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' /%3E%3C/svg%3E")'}} />
@@ -84,7 +84,7 @@ export default function WavifyWelcome() {
               <div className="mb-8 animate-fadeIn lg:hidden">
                 <div className="inline-block relative mb-6">
                   <div className="absolute inset-0 bg-red-600 blur-2xl opacity-30 animate-pulse" />
-                  <div className="relative w-20 h-20 sm:w-28 sm:h-28 bg-gradient-to-br from-red-600 via-red-700 to-red-900 rounded-3xl flex items-center justify-center shadow-2xl shadow-red-600/30 rotate-3 hover:rotate-0 transition-transform duration-500">
+                  <div className="relative w-20 h-20 sm:w-28 sm:h-28 bg-linear-to-br from-red-600 via-red-700 to-red-900 rounded-3xl flex items-center justify-center shadow-2xl shadow-red-600/30 rotate-3 hover:rotate-0 transition-transform duration-500">
                     <div className="flex gap-1.5">
                       <div className="w-2 h-12 bg-white rounded-full animate-pulse" style={{animationDelay: '0s'}} />
                       <div className="w-2 h-16 bg-white rounded-full animate-pulse" style={{animationDelay: '0.1s'}} />
@@ -97,7 +97,7 @@ export default function WavifyWelcome() {
               {/* Title Section */}
               <div className="animate-fadeIn">
                 <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black mb-4 tracking-tight">
-                  <span className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 bg-clip-text text-transparent animate-gradient">
+                  <span className="bg-linear-to-r from-red-600 via-red-700 to-red-800 bg-clip-text text-transparent animate-gradient">
                     Wavify
                   </span>
                 </h1>
@@ -113,7 +113,7 @@ export default function WavifyWelcome() {
               <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md mx-auto lg:mx-0">
                  <button
       onClick={() => navigate("/signup")}
-      className="flex-1 px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-semibold hover:from-red-500 hover:to-red-600 transition-all duration-300 shadow-lg shadow-red-600/30 hover:shadow-red-600/50 hover:scale-105 active:scale-95"
+      className="flex-1 px-8 py-4 bg-linear-to-r from-red-600 to-red-700 text-white rounded-xl font-semibold hover:from-red-500 hover:to-red-600 transition-all duration-300 shadow-lg shadow-red-600/30 hover:shadow-red-600/50 hover:scale-105 active:scale-95"
     >
       Start Free Trial
     </button>
@@ -146,7 +146,7 @@ export default function WavifyWelcome() {
                   {/* Rotating Vinyl */}
                   <div className="absolute -top-10 -right-10 hidden xl:block">
                     <div 
-                      className="w-28 h-28 rounded-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border-4 border-red-600 shadow-lg shadow-red-600/40 will-change-transform"
+                      className="w-28 h-28 rounded-full bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 border-4 border-red-600 shadow-lg shadow-red-600/40 will-change-transform"
                       style={{transform: `rotate(${vinyl.rotation}deg)`}}
                     >
                       <div className="w-full h-full rounded-full border-8 border-gray-700 flex items-center justify-center">
@@ -171,7 +171,7 @@ export default function WavifyWelcome() {
                   </div>
 
                   {/* Audio Wave */}
-                  <div className="mt-8 h-1.5 bg-gradient-to-r from-transparent via-red-600 to-transparent rounded-full animate-pulse" />
+                  <div className="mt-8 h-1.5 bg-linear-to-r from-transparent via-red-600 to-transparent rounded-full animate-pulse" />
                   
                   {/* Headphones Icon */}
                   <div className="mt-6 flex justify-center">
@@ -200,7 +200,7 @@ export default function WavifyWelcome() {
         {/* Features Section */}
         <section className="min-h-screen flex items-center justify-center px-6 py-16">
           <div className="max-w-6xl w-full">
-            <h2 className="text-4xl sm:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
+            <h2 className="text-4xl sm:text-5xl font-bold text-center mb-12 bg-linear-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
               Why Choose Wavify?
             </h2>
             
@@ -225,11 +225,11 @@ export default function WavifyWelcome() {
 
             {/* Additional features */}
             <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gradient-to-br from-red-50 to-white backdrop-blur-sm border border-red-200 rounded-2xl p-8 hover:shadow-xl hover:shadow-red-600/10 transition-all duration-300">
+              <div className="bg-linear-to-br from-red-50 to-white backdrop-blur-sm border border-red-200 rounded-2xl p-8 hover:shadow-xl hover:shadow-red-600/10 transition-all duration-300">
                 <h3 className="text-2xl font-bold mb-4 text-gray-900">Personalized Playlists</h3>
                 <p className="text-gray-600">AI-powered recommendations that understand your taste and discover new favorites</p>
               </div>
-              <div className="bg-gradient-to-br from-red-50 to-white backdrop-blur-sm border border-red-200 rounded-2xl p-8 hover:shadow-xl hover:shadow-red-600/10 transition-all duration-300">
+              <div className="bg-linear-to-br from-red-50 to-white backdrop-blur-sm border border-red-200 rounded-2xl p-8 hover:shadow-xl hover:shadow-red-600/10 transition-all duration-300">
                 <h3 className="text-2xl font-bold mb-4 text-gray-900">Share with Friends</h3>
                 <p className="text-gray-600">Create collaborative playlists and share your music journey with the world</p>
               </div>

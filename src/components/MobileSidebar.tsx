@@ -84,7 +84,7 @@ const MobileSidebar = forwardRef<HTMLElement | null, Props>(function MobileSideb
           className={`flex items-center justify-between p-5 border-b ${borderColor} sticky top-0 ${cardBg} z-10`}
         >
           <div className="flex items-center mt-1 gap-3">
-            <div className="w-12 h-13 rounded-lg bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center shadow">
+            <div className="w-12 h-13 rounded-lg bg-linear-to-br from-red-600 to-red-800 flex items-center justify-center shadow">
               <span className="text-white font-extrabold">W</span>
             </div>
             <div>
@@ -157,7 +157,7 @@ const MobileSidebar = forwardRef<HTMLElement | null, Props>(function MobileSideb
           <div
             className={`flex items-center gap-4 rounded-xl p-4 ${isDark ? "bg-zinc-800" : "bg-gray-100"}`}
           >
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center shadow">
+            <div className="w-12 h-12 rounded-full bg-linear-to-br from-red-600 to-red-800 flex items-center justify-center shadow">
               <span className="text-white font-bold text-lg">{userInitials}</span>
             </div>
 
@@ -166,7 +166,7 @@ const MobileSidebar = forwardRef<HTMLElement | null, Props>(function MobileSideb
               <p className="text-xs text-gray-400 truncate">{displayEmail}</p>
             </div>
 
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <button
                 onClick={() => {
                   navigate("/profile");

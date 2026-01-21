@@ -24,7 +24,6 @@ import {
   getTrendingSongs,
   getNewReleases,
   getTopCharts,
-  invalidateArtistsCache,
   type Song,
   type Playlist,
   type Genre,
@@ -154,8 +153,6 @@ const WavefyBrowser: React.FC = () => {
   const textSecondary = isDark ? "text-gray-400" : "text-gray-600";
   const cardBg = isDark ? "bg-white/5" : "bg-white";
   const cardHoverBg = isDark ? "hover:bg-white/7" : "hover:bg-gray-100";
-  const inputBg = isDark ? "bg-gray-800/10" : "bg-white";
-  const inputBorder = isDark ? "border-gray-200/50" : "border-gray-300";
   const chartContainerBg = isDark ? "bg-white/5" : "bg-white";
   const chartContainerBorder = isDark ? "border-white/5" : "border-gray-200";
 
@@ -326,7 +323,7 @@ async function toggleFollow(artistId: number) {
         <div className="hidden lg:block ">
           <div className="flex flex-col space-y-6">
           {/* Featured Playlists */}
-            <section className={`flex-shrink-0 mb-8 transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+            <section className={`shrink-0 mb-8 transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
               <div className="flex items-center gap-3 mb-4">
                 <PlayCircle className="w-6 h-6 text-red-600" />
                 <h2 className={`text-xl lg:text-2xl font-bold ${textPrimary}`}>Featured Playlists</h2>
@@ -369,7 +366,7 @@ async function toggleFollow(artistId: number) {
             </section>
 
             {/* Trending Now */}
-            <section className="flex-shrink-0 space-y-4">
+            <section className="shrink-0 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <TrendingUp className="w-8 h-8 text-red-600" />
@@ -407,11 +404,11 @@ async function toggleFollow(artistId: number) {
                       onMouseEnter={() => setHoveredCard(`song-${song.id}`)}
                       onMouseLeave={() => setHoveredCard(null)}
                       onClick={() => playTrendingSongAtIndex(idx, false)}
-                      className={`flex-shrink-0 w-72 ${cardBg} rounded-lg p-4 ${cardHoverBg} transition-all duration-300 hover:scale-105 cursor-pointer group`}
+                      className={`shrink-0 w-72 ${cardBg} rounded-lg p-4 ${cardHoverBg} transition-all duration-300 hover:scale-105 cursor-pointer group`}
                       style={{ scrollSnapAlign: "start" }}
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0 shadow-lg">
+                        <div className="w-16 h-16 rounded-md overflow-hidden shrink-0 shadow-lg">
                           <img src={song.cover} alt={`${song.title} artwork`} className="w-full h-full object-cover" loading="lazy" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -429,7 +426,7 @@ async function toggleFollow(artistId: number) {
                               playTrendingSongAtIndex(idx, false);
                             }
                           }}
-                          className={`bg-red-600 rounded-full p-2 transition-all duration-300 flex-shrink-0 ${
+                          className={`bg-red-600 rounded-full p-2 transition-all duration-300 shrink-0 ${
                             hoveredCard === `song-${song.id}` ? "opacity-100 scale-100" : "opacity-0 scale-75"
                           } hover:bg-red-700`}
                         >
@@ -464,13 +461,13 @@ async function toggleFollow(artistId: number) {
     className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
     style={{ scrollSnapType: "x mandatory" }}
   >
-    {featuredPlaylists.map((playlistItem, idx) => (
+    {featuredPlaylists.map((playlistItem) => (
       <div
         key={playlistItem.id}
         onMouseEnter={() => setHoveredCard(`playlist-${playlistItem.id}`)}
         onMouseLeave={() => setHoveredCard(null)}
         onClick={() => navigateToPlaylist(playlistItem.name)}
-        className={`flex-shrink-0 w-[calc(40%-8px)] group relative ${cardBg} rounded-lg p-4 cursor-pointer transition-all duration-300 ${cardHoverBg} hover:scale-105 hover:shadow-2xl`}
+        className={`shrink-0 w-[calc(40%-8px)] group relative ${cardBg} rounded-lg p-4 cursor-pointer transition-all duration-300 ${cardHoverBg} hover:scale-105 hover:shadow-2xl`}
         style={{ scrollSnapAlign: "start" }}
       >
         <div className="w-full aspect-square rounded-md mb-4 overflow-hidden shadow-lg">
@@ -503,10 +500,10 @@ async function toggleFollow(artistId: number) {
                   <div
                     key={song.id}
                     onClick={() => playTrendingSongAtIndex(idx, true)}
-                    className={`flex-shrink-0 w-72 ${cardBg} rounded-lg p-4 ${cardHoverBg} transition-all duration-300 hover:scale-105 cursor-pointer`}
+                    className={`shrink-0 w-72 ${cardBg} rounded-lg p-4 ${cardHoverBg} transition-all duration-300 hover:scale-105 cursor-pointer`}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0 shadow-lg">
+                      <div className="w-16 h-16 rounded-md overflow-hidden shrink-0 shadow-lg">
                         <img src={song.cover} alt={`${song.title} artwork`} className="w-full h-full object-cover" loading="lazy" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -524,7 +521,7 @@ async function toggleFollow(artistId: number) {
                             playTrendingSongAtIndex(idx, true);
                           }
                         }}
-                        className="bg-red-600 rounded-full p-2 transition-all flex-shrink-0"
+                        className="bg-red-600 rounded-full p-2 transition-all shrink-0"
                       >
                         {isThisSongPlaying ? (
                           <Pause className="w-4 h-4 text-white fill-white" />
@@ -575,7 +572,7 @@ async function toggleFollow(artistId: number) {
                 onMouseEnter={() => setHoveredCard(`genre-${genre.id}`)}
                 onMouseLeave={() => setHoveredCard(null)}
                 onClick={() => navigateToGenre(genre.name)}
-                className={`flex-shrink-0 w-[calc(40%-8px)] lg:w-40 group relative rounded-lg cursor-pointer transition-all duration-300 overflow-hidden hover:scale-105 hover:shadow-2xl ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                className={`shrink-0 w-[calc(40%-8px)] lg:w-40 group relative rounded-lg cursor-pointer transition-all duration-300 overflow-hidden hover:scale-105 hover:shadow-2xl ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
                 style={{ transitionDelay: `${idx * 40}ms`, scrollSnapAlign: "start" }}
               >
                 <div className="w-full aspect-square overflow-hidden rounded-lg shadow-md">
@@ -638,7 +635,7 @@ async function toggleFollow(artistId: number) {
                 onMouseEnter={() => setHoveredCard(`artist-${artist.id}`)}
                 onMouseLeave={() => setHoveredCard(null)}
                 onClick={() => navigateToArtist(artist.name)}
-                className={`flex-shrink-0 w-[calc(50%-8px)] lg:w-40 ${cardBg} rounded-lg p-3 cursor-pointer transition-all duration-300 ${cardHoverBg} hover:scale-105 hover:shadow-2xl group`}
+                className={`shrink-0 w-[calc(50%-8px)] lg:w-40 ${cardBg} rounded-lg p-3 cursor-pointer transition-all duration-300 ${cardHoverBg} hover:scale-105 hover:shadow-2xl group`}
                 style={{ scrollSnapAlign: "start" }}
               >
                 <div className="w-full aspect-square rounded-full mb-3 overflow-hidden mx-auto shadow-lg">
@@ -708,7 +705,7 @@ async function toggleFollow(artistId: number) {
                   onMouseEnter={() => setHoveredCard(`release-${release.id}`)}
                   onMouseLeave={() => setHoveredCard(null)}
                   onClick={() => playNewReleaseAtIndex(idx, true)}
-                  className={`flex-shrink-0 w-[calc(40%-8px)] lg:w-40 group relative ${cardBg} rounded-lg p-3 cursor-pointer transition-all duration-300 ${cardHoverBg} hover:scale-105 hover:shadow-2xl ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+                  className={`shrink-0 w-[calc(40%-8px)] lg:w-40 group relative ${cardBg} rounded-lg p-3 cursor-pointer transition-all duration-300 ${cardHoverBg} hover:scale-105 hover:shadow-2xl ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
                   style={{ transitionDelay: `${idx * 60}ms`, scrollSnapAlign: "start" }}
                 >
                   <div className="w-full aspect-square rounded-md mb-3 overflow-hidden shadow-lg">
@@ -763,7 +760,7 @@ async function toggleFollow(artistId: number) {
                     className={`flex items-center gap-4 p-3 rounded-lg ${cardHoverBg} transition-all duration-300 cursor-pointer group`}
                   >
                     <div className={`text-2xl font-bold w-8 ${textSecondary} hidden lg:block`}>{idx + 1}</div>
-                    <div className="w-14 h-14 rounded-md overflow-hidden flex-shrink-0 shadow-md">
+                    <div className="w-14 h-14 rounded-md overflow-hidden shrink-0 shadow-md">
                       <img src={song.cover} alt={`${song.title} artwork`} className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -781,7 +778,7 @@ async function toggleFollow(artistId: number) {
                           playTopChartAtIndex(idx, true);
                         }
                       }}
-                      className={`bg-red-600 rounded-full p-2 transition-all duration-300 flex-shrink-0 ${
+                      className={`bg-red-600 rounded-full p-2 transition-all duration-300 shrink-0 ${
                         hoveredCard === `chart-${song.id}` ? "opacity-100 scale-100" : "md:opacity-0 md:scale-75 opacity-100 scale-100"
                       } hover:bg-red-700`}
                     >

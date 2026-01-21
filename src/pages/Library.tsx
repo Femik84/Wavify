@@ -62,7 +62,7 @@ const SongListItem = ({
         {index + 1}
       </div>
 
-      <div className="w-14 h-14 rounded-md overflow-hidden flex-shrink-0 shadow-md relative">
+      <div className="w-14 h-14 rounded-md overflow-hidden shrink-0 shadow-md relative">
         <img
           src={song.cover}
           alt={`${song.title} artwork`}
@@ -90,7 +90,7 @@ const SongListItem = ({
 
       <button
         aria-label={`Play ${song.title}`}
-        className={`bg-red-600 rounded-full p-2 transition-all duration-300 flex-shrink-0`}
+        className={`bg-red-600 rounded-full p-2 transition-all duration-300 shrink-0`}
         onClick={(e) => {
           e.stopPropagation();
           onPlay();
@@ -127,7 +127,7 @@ const ArtistCard = ({
 
   return (
     <div
-      className={`flex-shrink-0 w-48 ${cardBg} rounded-lg p-4 cursor-pointer transition-all duration-300 ${cardHoverBg} hover:scale-105 hover:shadow-2xl group`}
+      className={`shrink-0 w-48 ${cardBg} rounded-lg p-4 cursor-pointer transition-all duration-300 ${cardHoverBg} hover:scale-105 hover:shadow-2xl group`}
       style={{ scrollSnapAlign: "start" }}
       onClick={onClick}
     >
@@ -161,7 +161,7 @@ export default function Library() {
   const [sidebarOpen, setSidebarOpenState] = useState(false);
   const sidebarRef = useRef<HTMLElement | null>(null);
 
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [, setHoveredCard] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<"recent" | "title" | "artist">("recent");
   const [showSortMenu, setShowSortMenu] = useState(false);
   const recentlyPlayedRef = useRef<HTMLDivElement>(null);
@@ -468,7 +468,7 @@ export default function Library() {
           <div className="flex items-center justify-between mb-4 lg:mb-6">
             <div>
               <div className="flex items-center gap-3  lg:mb-0">
-                <div className="w-9 h-9 relative top-3 lg:top-0 ml-2 bg-gradient-to-br from-red-600 to-red-800 rounded flex items-center justify-center">
+                <div className="w-9 h-9 relative top-3 lg:top-0 ml-2 bg-linear-to-br from-red-600 to-red-800 rounded flex items-center justify-center">
                   <Heart className="w-5 h-5 text-white fill-white" />
                 </div>
                 <h2 className={`text-2xl lg:text-3xl font-bold ${textPrimary}`}>Liked Songs</h2>
@@ -598,12 +598,12 @@ export default function Library() {
                     key={item.id}
                     onMouseEnter={() => setHoveredCard(`recent-${item.id}`)}
                     onMouseLeave={() => setHoveredCard(null)}
-                    className={`flex-shrink-0 w-72 ${cardBg} rounded-lg p-4 ${cardHoverBg} transition-all duration-300 hover:scale-105 cursor-pointer group`}
+                    className={`shrink-0 w-72 ${cardBg} rounded-lg p-4 ${cardHoverBg} transition-all duration-300 hover:scale-105 cursor-pointer group`}
                     style={{ scrollSnapAlign: "start" }}
                     onClick={() => handlePlayRecentItem(item)}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-md overflow-hidden flex-shrink-0 shadow-lg">
+                      <div className="w-16 h-16 rounded-md overflow-hidden shrink-0 shadow-lg">
                         <img
                           src={item.cover}
                           alt={`${item.title} artwork`}
@@ -625,7 +625,7 @@ export default function Library() {
 
                       <button
                         aria-label={`Play ${item.title}`}
-                        className={`bg-red-600 rounded-full p-2 transition-all duration-300 flex-shrink-0`}
+                        className={`bg-red-600 rounded-full p-2 transition-all duration-300 shrink-0`}
                         onClick={(e) => {
                           e.stopPropagation();
                           if (isCurrentSong && isPlaying) {

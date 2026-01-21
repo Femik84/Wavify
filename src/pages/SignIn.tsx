@@ -54,7 +54,7 @@ export default function WavifySignin() {
   return (
     <div className="min-h-screen bg-white text-gray-900 overflow-hidden relative">
       {/* Clean Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-red-50" />
+      <div className="absolute inset-0 bg-linear-to-br from-gray-50 via-white to-red-50" />
 
       {/* Main Container */}
       <div className="relative min-h-screen flex items-center justify-center p-4 lg:p-8">
@@ -71,13 +71,13 @@ export default function WavifySignin() {
                 {/* Logo Area */}
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl flex items-center justify-center shadow-2xl shadow-red-600/30">
+                    <div className="w-16 h-16 lg:w-20 lg:h-20 bg-linear-to-br from-red-600 to-red-700 rounded-2xl flex items-center justify-center shadow-2xl shadow-red-600/30">
                       <Music className="w-8 h-8 lg:w-10 lg:h-10 text-white" />
                     </div>
-                    <div className="absolute -inset-1 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl blur opacity-40 animate-pulse" />
+                    <div className="absolute -inset-1 bg-linear-to-br from-red-600 to-red-700 rounded-2xl blur opacity-40 animate-pulse" />
                   </div>
                   <div>
-                    <h1 className="text-4xl lg:text-6xl font-black bg-gradient-to-r from-gray-900 via-red-600 to-red-700 bg-clip-text text-transparent">
+                    <h1 className="text-4xl lg:text-6xl font-black bg-linear-to-r from-gray-900 via-red-600 to-red-700 bg-clip-text text-transparent">
                       Wavify
                     </h1>
                     <p className="text-red-600 text-sm lg:text-base font-semibold tracking-wider">PREMIUM AUDIO</p>
@@ -89,7 +89,7 @@ export default function WavifySignin() {
                   <h2 className="text-3xl lg:text-5xl font-black leading-tight text-gray-900">
                     Welcome Back
                     <br />
-                    <span className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 bg-clip-text text-transparent">
+                    <span className="bg-linear-to-r from-red-600 via-red-700 to-red-800 bg-clip-text text-transparent">
                       To Your Music
                     </span>
                   </h2>
@@ -109,7 +109,7 @@ export default function WavifySignin() {
                       key={i}
                       className="flex items-center gap-4 group cursor-pointer"
                     >
-                      <div className="w-12 h-12 bg-gradient-to-br from-red-50 to-red-100 backdrop-blur-sm rounded-xl flex items-center justify-center border border-red-200 group-hover:border-red-400 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-red-600/20">
+                      <div className="w-12 h-12 bg-linear-to-br from-red-50 to-red-100 backdrop-blur-sm rounded-xl flex items-center justify-center border border-red-200 group-hover:border-red-400 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-red-600/20">
                         <feature.icon className="w-5 h-5 text-red-600 group-hover:text-red-700 transition-colors" />
                       </div>
                       <span className="text-gray-700 group-hover:text-gray-900 transition-colors font-medium">
@@ -124,7 +124,7 @@ export default function WavifySignin() {
                   {[...Array(3)].map((_, i) => (
                     <div
                       key={i}
-                      className="h-1 bg-gradient-to-r from-red-600 via-red-500 to-transparent rounded-full"
+                      className="h-1 bg-linear-to-r from-red-600 via-red-500 to-transparent rounded-full"
                       style={{ width: `${100 - i * 15}%` }}
                     />
                   ))}
@@ -155,7 +155,7 @@ export default function WavifySignin() {
           <div className="relative order-1 lg:order-2">
             <div className="relative bg-white/80 backdrop-blur-2xl rounded-3xl p-8 lg:p-12 border border-gray-200 shadow-2xl shadow-gray-900/10">
               {/* Glow Effect */}
-              <div className="absolute -inset-0.5 bg-gradient-to-br from-red-200/40 via-transparent to-red-300/40 rounded-3xl blur opacity-60" />
+              <div className="absolute -inset-0.5 bg-linear-to-br from-red-200/40 via-transparent to-red-300/40 rounded-3xl blur opacity-60" />
               
               <div className="relative space-y-8">
                 {/* Form Header */}
@@ -234,7 +234,7 @@ export default function WavifySignin() {
                   <button
                     onClick={handleSubmit}
                     disabled={loading || success}
-                    className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-red-600/30 hover:shadow-red-600/50 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 group mt-8 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    className="w-full bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-red-600/30 hover:shadow-red-600/50 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 group mt-8 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
                     {loading ? (
                       <>

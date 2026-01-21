@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import MobileSidebar from "../components/MobileSidebar";
 import Footer from "../components/Footer";
+import React from 'react';
 import {
   fetchPlaylists,
   getTrendingSongs,
@@ -42,11 +43,9 @@ export default function Home() {
   // Only store the last 4 recently played items
   const [recentlyPlayed, setRecentlyPlayed] = useState<Song[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);
-  const [artists, setArtists] = useState<Artist[]>([]);
+  const [, setArtists] = useState<Artist[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Ensure initial playlist is only set once after trending loads
+  const [, setError] = useState<string | null>(null);
   const initRef = useRef(false);
 
   useEffect(() => {
@@ -135,9 +134,7 @@ export default function Home() {
   function navigateToGenre(name: string) {
     navigate(`/genre/${encodeURIComponent(name)}`);
   }
-  function navigateToArtist(name: string) {
-    navigate(`/artist/${encodeURIComponent(name)}`);
-  }
+
 
   // Helper to keep recentlyPlayed state limited to last 4 and avoid duplicates.
   // Uses song.id if available, otherwise falls back to audio URL as an identifier.
@@ -247,7 +244,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
       onClick={() => navigateToHeroPlaylist(heroSlides[currentSlide])}
     >
       <img src={slide.image} alt={slide.name} className="w-full h-full object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent" />
       <div className="absolute bottom-6 left-6 space-y-2">
         <h2 className="text-3xl font-black text-white">{slide.name}</h2>
         <p className="text-sm text-gray-300 line-clamp-2">{slide.description}</p>
@@ -315,7 +312,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
       return (
         <div
           key={song.id}
-          className={`${cardBg} rounded-2xl p-4 ${hoverBg} transition group cursor-pointer shadow-lg hover:shadow-2xl flex-shrink-0`}
+          className={`${cardBg} rounded-2xl p-4 ${hoverBg} transition group cursor-pointer shadow-lg hover:shadow-2xl shrink-0`}
           style={{ width: 'calc((100% - 20px) / 2.5)' }}
           onClick={() => playTrendingSongAtIndex(idx, true)}
         >
@@ -373,7 +370,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
                     className={`${cardBg} rounded-2xl p-4 ${hoverBg} transition cursor-pointer flex items-center gap-4 shadow-lg hover:shadow-2xl group/item`}
                     onClick={() => playRecentlyPlayedAtIndex(idx, true)}
                   >
-                    <img src={song.cover} alt={song.title} className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
+                    <img src={song.cover} alt={song.title} className="w-16 h-16 rounded-lg object-cover shrink-0" />
                     <div className="flex-1 min-w-0">
                       <h4 className="font-bold truncate">{song.title}</h4>
                       <p className={`text-sm ${textSecondary} truncate`}>
@@ -389,7 +386,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
                           playRecentlyPlayedAtIndex(idx, true);
                         }
                       }}
-                      className="flex-shrink-0 p-2 text-red-600"
+                      className="shrink-0 p-2 text-red-600"
                     >
                       {isThisSongPlaying ? (
                         <Pause className="w-5 h-5 fill-current" />
@@ -415,7 +412,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
                 >
                   <div className="absolute inset-0 w-full h-full">
                     <img src={genre.image} alt={genre.name} className="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-black/60 to-black/20" />
+                    <div className="absolute inset-0 bg-linear-to-br from-black/60 to-black/20" />
                   </div>
                   <div className="relative z-10 h-full flex items-end p-4">
                     <p className="font-bold text-base text-white">{genre.name}</p>
@@ -430,7 +427,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
         <div className="hidden lg:grid lg:grid-cols-[400px_1fr] lg:gap-8">
           {/* Trending Now, Main, Genres, Artists */}
           <div className="flex flex-col h-[calc(100vh-12rem)]">
-            <div className="flex items-center gap-3 mb-6 flex-shrink-0">
+            <div className="flex items-center gap-3 mb-6 shrink-0">
               <TrendingUp className="w-8 h-8 text-red-600" />
               <h3 className="text-3xl font-bold">Trending Now</h3>
             </div>
@@ -449,7 +446,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
                       onClick={() => playTrendingSongAtIndex(idx, false)}
                     >
                       <div className={`text-xl font-bold w-6 ${textSecondary}`}>{idx + 1}</div>
-                      <div className="w-12 h-12 rounded-md overflow-hidden flex-shrink-0 shadow-md">
+                      <div className="w-12 h-12 rounded-md overflow-hidden shrink-0 shadow-md">
                         <img src={song.cover} alt={song.title} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -465,7 +462,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
                             playTrendingSongAtIndex(idx, false);
                           }
                         }}
-                        className={`bg-red-600 rounded-full p-2 transition-all duration-300 flex-shrink-0 ${
+                        className={`bg-red-600 rounded-full p-2 transition-all duration-300 shrink-0 ${
                           hoveredCard === `trending-${idx}` ? "opacity-100 scale-100" : "opacity-0 scale-75"
                         } hover:bg-red-700`}
                       >
@@ -491,7 +488,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
                   onClick={() => navigateToHeroPlaylist(heroSlides[currentSlide])}
                 >
                   <img src={slide.image} alt={slide.name} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent" />
                   <div className="absolute bottom-8 left-8 space-y-3">
                     <h2 className="text-4xl font-black text-white">{slide.name}</h2>
                     <p className="text-lg text-gray-300">{slide.description}</p>
@@ -551,7 +548,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
                     onClick={() => navigateToPlaylist(mix.name)}
                   >
                     <div className="flex gap-3 items-center">
-                      <img src={mix.image} alt={mix.name} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
+                      <img src={mix.image} alt={mix.name} className="w-14 h-14 rounded-lg object-cover shrink-0" />
                       <div className="flex-1 min-w-0">
                         <h4 className="font-bold text-sm mb-0.5 truncate">{mix.name}</h4>
                         <p className={`text-xs ${textSecondary} line-clamp-2`}>{mix.description}</p>
@@ -576,7 +573,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
                       className={`${cardBg} rounded-2xl p-4 ${hoverBg} transition cursor-pointer flex items-center gap-4 shadow-lg hover:shadow-2xl group/item`}
                       onClick={() => playRecentlyPlayedAtIndex(idx, false)}
                     >
-                      <img src={song.cover} alt={song.title} className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
+                      <img src={song.cover} alt={song.title} className="w-16 h-16 rounded-lg object-cover shrink-0" />
                       <div className="flex-1 min-w-0">
                         <h4 className="font-bold truncate">{song.title}</h4>
                         <p className={`text-sm ${textSecondary} truncate`}>
@@ -592,7 +589,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
                             playRecentlyPlayedAtIndex(idx, false);
                           }
                         }}
-                        className="p-3 bg-red-600 rounded-full opacity-0 group-hover/item:opacity-100 transition transform group-hover/item:scale-110 flex-shrink-0"
+                        className="p-3 bg-red-600 rounded-full opacity-0 group-hover/item:opacity-100 transition transform group-hover/item:scale-110 shrink-0"
                       >
                         {isThisSongPlaying ? (
                           <Pause className="w-4 h-4 fill-white" />
@@ -618,7 +615,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
                   >
                     <div className="absolute inset-0 w-full h-full">
                       <img src={genre.image} alt={genre.name} className="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" />
-                      <div className="absolute inset-0 bg-gradient-to-br from-black/60 to-black/20" />
+                      <div className="absolute inset-0 bg-linear-to-br from-black/60 to-black/20" />
                     </div>
                     <div className="relative z-10 h-full flex items-end p-4">
                       <p className="font-bold text-base text-white">{genre.name}</p>

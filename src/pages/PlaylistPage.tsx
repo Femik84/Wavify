@@ -37,7 +37,7 @@ export default function PlaylistPage() {
   const navigate = useNavigate();
   const { entityId } = useParams<{ entityId: string }>();
   const entityType = useEntityType();
-  const { isDark, setTheme } = useTheme();
+  const { isDark, } = useTheme();
 
   const [entity, setEntity] = useState<Playlist | Genre | Artist | null>(null);
   const [entitySongs, setEntitySongs] = useState<Song[]>([]);
@@ -262,7 +262,7 @@ export default function PlaylistPage() {
                   }}
                 >
                   <div className="flex items-center gap-3">
-                    <img src={song.cover} alt={song.title} className="w-14 h-14 rounded-lg object-cover shadow-md flex-shrink-0" />
+                    <img src={song.cover} alt={song.title} className="w-14 h-14 rounded-lg object-cover shadow-md shrink-0" />
                     <div className="flex-1 min-w-0">
                       <h4 className={`font-semibold truncate ${isCurrentSong ? "text-red-600" : ""}`}>{song.title}</h4>
                       <p className={`text-sm ${textSecondary} truncate`}>{song.artist.name}</p>
@@ -299,7 +299,7 @@ export default function PlaylistPage() {
           >
             <div className="px-8 py-6">
               <div className="flex items-end gap-6">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <img src={imageSrc} alt={title} className="w-44 h-44 rounded-2xl shadow-2xl object-cover" />
                 </div>
                 <div className="space-y-2 pb-2 flex-1 min-w-0">
@@ -319,7 +319,7 @@ export default function PlaylistPage() {
 
                 <button
                   onClick={playAllSongs}
-                  className="w-12 h-12 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center shadow-lg transition transform hover:scale-105 flex-shrink-0 mb-2"
+                  className="w-12 h-12 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center shadow-lg transition transform hover:scale-105 shrink-0 mb-2"
                 >
                   <Play className="w-5 h-5 fill-white ml-0.5" />
                 </button>
@@ -389,7 +389,7 @@ export default function PlaylistPage() {
       <div className="lg:hidden">
         <div className="relative h-80">
           <img src={imageSrc} alt={title} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black" />
+          <div className="absolute inset-0 bg-linear-to-b from-black/40 via-black/60 to-black" />
 
           {/* Back Button */}
           <button
@@ -418,7 +418,7 @@ export default function PlaylistPage() {
 
             <button
               onClick={playAllSongs}
-              className="flex-shrink-0 w-14 h-14 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center shadow-2xl transition-all transform active:scale-95 hover:scale-105"
+              className="shrink-0 w-14 h-14 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center shadow-2xl transition-all transform active:scale-95 hover:scale-105"
             >
               <Play className="w-6 h-6 fill-white text-white ml-0.5" />
             </button>
@@ -443,7 +443,7 @@ export default function PlaylistPage() {
                     }
                   }}
                 >
-                  <div className="w-6 flex items-center justify-center flex-shrink-0">
+                  <div className="w-6 flex items-center justify-center shrink-0">
                     {isThisSongPlaying ? (
                       <Pause className="w-4 h-4 fill-current text-red-600" />
                     ) : (
@@ -451,7 +451,7 @@ export default function PlaylistPage() {
                     )}
                   </div>
 
-                  <div className="relative flex-shrink-0">
+                  <div className="relative shrink-0">
                     <img src={song.cover} alt={song.title} className="w-14 h-14 rounded-lg object-cover shadow-md" />
                     {isThisSongPlaying && (
                       <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center">
