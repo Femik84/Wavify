@@ -33,22 +33,20 @@ import LoadingSkeleton from "../components/LoadingSkeleton";
 import BrowserSearch from "../components/BrowseSearch";
 
 /**
- * Fixes applied (behavior-only, no UI changes):
- * - Implement touch handlers for horizontal carousels so vertical scrolling always works
- *   when the user intends to scroll vertically even if the touch starts on a horizontal card area.
- * - Keep smooth scrolling enabled while component is mounted.
- * - Maintain existing visual markup and styles.
+ * Fix summary:
+ * - Implemented pointer-based drag handling for horizontal carousels to reliably detect
+ *   user intent and allow both smooth vertical page scrolling and smooth horizontal
+ *   carousel scrolling without changing UI.
+ * - Added wheel handling for horizontal deltas (trackpad/mouse wheel) to improve horizontal responsiveness.
+ * - Kept smooth scrolling enabled globally while mounted.
  *
- * Approach:
- * - Add a shared touch-state ref to detect gesture direction on touchstart/touchmove.
- * - When movement is predominantly horizontal, we perform manual horizontal scroll and preventDefault
- *   to stop the page from scrolling vertically.
- * - When movement is predominantly vertical, we let the browser handle the scroll (no preventDefault).
- *
- * This resolves the issue where users had to touch another part of the page to scroll.
+ * Rationale:
+ * - Pointer events let us defer to browser vertical panning by not capturing the pointer
+ *   until we detect a horizontal gesture. Once horizontal intent is detected we capture
+ *   the pointer and perform manual scrolling so horizontal scroll feels immediate & smooth.
  */
 
-// Utility function to safely get artist name
+/* Utility function to safely get artist name */
 function getArtistName(artist: any): string {
   if (!artist) return "Unknown Artist";
   return typeof artist === "string" ? artist : artist.name || "Unknown Artist";
@@ -329,61 +327,121 @@ const WavefyBrowser: React.FC = () => {
     }
   }
 
-  // --- Touch gesture handling for horizontal carousels ---
-  // Shared touch state used for all carousels.
-  const touchStateRef = useRef<{
+  // --------------------------
+  // Pointer-based carousel logic
+  // --------------------------
+  // Shared pointer state - it is fine to be shared because typical interactions are single-touch.
+  const pointerStateRef = useRef<{
+    pointerId: number | null;
     startX: number;
     startY: number;
     lastX: number;
     isHorizontal: boolean | null;
-  }>({ startX: 0, startY: 0, lastX: 0, isHorizontal: null });
+    isCapturing: boolean;
+  }>({
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    lastX: 0,
+    isHorizontal: null,
+    isCapturing: false,
+  });
 
-  function handleCarouselTouchStart(e: React.TouchEvent) {
-    const t = e.touches[0];
-    touchStateRef.current.startX = t.clientX;
-    touchStateRef.current.startY = t.clientY;
-    touchStateRef.current.lastX = t.clientX;
-    touchStateRef.current.isHorizontal = null;
+  function handlePointerDown(e: React.PointerEvent) {
+    // Only respond to primary pointers
+    if (e.button && e.button !== 0) return;
+    const s = pointerStateRef.current;
+    s.pointerId = e.pointerId;
+    s.startX = e.clientX;
+    s.startY = e.clientY;
+    s.lastX = e.clientX;
+    s.isHorizontal = null;
+    s.isCapturing = false;
+    // Do not setPointerCapture yet - wait until horizontal intent is detected
   }
 
-  function handleCarouselTouchMove(e: React.TouchEvent) {
-    const t = e.touches[0];
-    const s = touchStateRef.current;
-    const deltaX = t.clientX - s.lastX;
-    const totalDx = t.clientX - s.startX;
-    const totalDy = t.clientY - s.startY;
+  function handlePointerMove(e: React.PointerEvent) {
+    const s = pointerStateRef.current;
+    if (s.pointerId !== e.pointerId) return;
 
-    // If direction undecided, decide based on initial movement
+    const dx = e.clientX - s.lastX;
+    const totalDx = e.clientX - s.startX;
+    const totalDy = e.clientY - s.startY;
+
+    // Decide gesture direction if undecided
     if (s.isHorizontal === null) {
-      // small threshold to avoid jitter
-      const threshold = 6;
+      const threshold = 6; // pixels
       if (Math.abs(totalDx) > threshold || Math.abs(totalDy) > threshold) {
         s.isHorizontal = Math.abs(totalDx) > Math.abs(totalDy);
+        if (s.isHorizontal) {
+          // capture the pointer so we receive all subsequent moves
+          try {
+            (e.currentTarget as Element & { setPointerCapture?: any }).setPointerCapture?.(e.pointerId);
+            s.isCapturing = true;
+          } catch (err) {
+            // ignore if not supported
+            s.isCapturing = false;
+          }
+        } else {
+          // vertical gesture: let browser handle it (do not capture)
+        }
       } else {
-        // not enough movement yet
-        s.lastX = t.clientX;
+        s.lastX = e.clientX;
         return;
       }
     }
 
     if (s.isHorizontal) {
-      // user intends horizontal scroll: perform manual scroll and prevent vertical page scroll
-      e.preventDefault();
-      const el = e.currentTarget as HTMLElement | null;
-      if (el) {
-        // invert deltaX to match natural scrolling
-        el.scrollLeft -= deltaX;
-      }
-      s.lastX = t.clientX;
+      // perform manual horizontal scroll
+      e.preventDefault(); // stop unintended text selection / native behavior
+      const el = e.currentTarget as HTMLElement;
+      el.scrollLeft -= dx;
+      s.lastX = e.clientX;
     } else {
-      // user intends vertical scroll: do nothing and allow default browser behavior
-      // update lastX so future horizontal calculation isn't skewed
-      s.lastX = t.clientX;
+      // vertical gesture: let browser handle it; update lastX for future calculations
+      s.lastX = e.clientX;
+      // if we had captured earlier (unlikely) release
+      if (s.isCapturing) {
+        try {
+          (e.currentTarget as any).releasePointerCapture?.(e.pointerId);
+        } catch {
+          // ignore
+        }
+        s.isCapturing = false;
+      }
     }
   }
 
-  function handleCarouselTouchEnd() {
-    touchStateRef.current.isHorizontal = null;
+  function handlePointerUpOrCancel(e: React.PointerEvent) {
+    const s = pointerStateRef.current;
+    if (s.pointerId !== e.pointerId) return;
+    if (s.isCapturing) {
+      try {
+        (e.currentTarget as any).releasePointerCapture?.(e.pointerId);
+      } catch {
+        // ignore
+      }
+    }
+    s.pointerId = null;
+    s.isHorizontal = null;
+    s.isCapturing = false;
+  }
+
+  // Wheel handler: support horizontal wheel/trackpad gestures smartly
+  function handleCarouselWheel(e: React.WheelEvent) {
+    // If horizontal delta present or shift key pressed, perform horizontal scroll on carousel
+    const el = e.currentTarget as HTMLElement;
+    const absX = Math.abs(e.deltaX);
+    const absY = Math.abs(e.deltaY);
+
+    // If horizontal movement is dominant OR shift is pressed -> scroll horizontally
+    if (absX > absY || e.shiftKey) {
+      // For smoothness, use scrollBy with behavior 'auto' so it feels immediate
+      el.scrollLeft += e.deltaX || e.deltaY;
+      // prevent vertical page scroll when we handled horizontal intent
+      e.preventDefault();
+    }
+    // otherwise, let the browser handle vertical scrolling
   }
 
   // Loading / error states UI
@@ -407,8 +465,20 @@ const WavefyBrowser: React.FC = () => {
     );
   }
 
+  // Helper props applied to all carousel containers to enable pointer/wheel handling.
+  const carouselCommonProps = {
+    onPointerDown: handlePointerDown,
+    onPointerMove: handlePointerMove,
+    onPointerUp: handlePointerUpOrCancel,
+    onPointerCancel: handlePointerUpOrCancel,
+    onPointerLeave: handlePointerUpOrCancel,
+    onWheel: handleCarouselWheel,
+    // touchAction: 'pan-y' lets vertical browser panning happen by default; horizontal will be handled by our pointer logic
+    style: { touchAction: "pan-y", WebkitOverflowScrolling: "touch" } as React.CSSProperties,
+    className: "flex gap-4 overflow-x-auto py-2 px-1 scroll-smooth hide-scrollbar",
+  };
+
   return (
-    // Keep touchAction: 'pan-y' on the main container so vertical pans start reliably.
     <div
       className={`min-h-screen ${bgColor} ${textPrimary} transition-colors duration-300 pb-20 lg:pb-29`}
       onClick={handleGlobalClick}
@@ -502,12 +572,9 @@ const WavefyBrowser: React.FC = () => {
               </div>
               <div
                 ref={trendingRef}
-                // Removed forced touch-action: pan-x so vertical pans can begin when appropriate.
-                className="flex gap-4 overflow-x-auto py-2 px-1 scroll-smooth hide-scrollbar"
-                style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
-                onTouchStart={handleCarouselTouchStart}
-                onTouchMove={handleCarouselTouchMove}
-                onTouchEnd={handleCarouselTouchEnd}
+                {...carouselCommonProps}
+                // keep scrollSnap for nice snapping behavior
+                style={{ ...(carouselCommonProps.style as any), scrollSnapType: "x mandatory" }}
               >
                 {trendingSongs.map((song, idx) => {
                   const isCurrentSong = playlist[currentIndex]?.audio === song.audio;
@@ -571,11 +638,8 @@ const WavefyBrowser: React.FC = () => {
 
             <div
               ref={featuredRef}
-              className="flex gap-4 overflow-x-auto py-2 px-1 scroll-smooth hide-scrollbar"
-              style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
-              onTouchStart={handleCarouselTouchStart}
-              onTouchMove={handleCarouselTouchMove}
-              onTouchEnd={handleCarouselTouchEnd}
+              {...carouselCommonProps}
+              style={{ ...(carouselCommonProps.style as any), scrollSnapType: "x mandatory" }}
             >
               {featuredPlaylists.map((playlistItem) => (
                 <div
@@ -608,11 +672,8 @@ const WavefyBrowser: React.FC = () => {
               <h3 className={`text-2xl font-bold ${textPrimary}`}>Trending Now</h3>
             </div>
             <div
-              className="flex gap-4 overflow-x-auto py-2 px-1 scroll-smooth hide-scrollbar"
-              style={{ WebkitOverflowScrolling: "touch" }}
-              onTouchStart={handleCarouselTouchStart}
-              onTouchMove={handleCarouselTouchMove}
-              onTouchEnd={handleCarouselTouchEnd}
+              {...carouselCommonProps}
+              style={{ ...(carouselCommonProps.style as any), WebkitOverflowScrolling: "touch" }}
             >
               {trendingSongs.map((song, idx) => {
                 const isCurrentSong = playlist[currentIndex]?.audio === song.audio;
@@ -685,11 +746,8 @@ const WavefyBrowser: React.FC = () => {
           </div>
           <div
             ref={genresRef}
-            className="flex gap-4 overflow-x-auto py-2 px-1 scroll-smooth hide-scrollbar"
-            style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
-            onTouchStart={handleCarouselTouchStart}
-            onTouchMove={handleCarouselTouchMove}
-            onTouchEnd={handleCarouselTouchEnd}
+            {...carouselCommonProps}
+            style={{ ...(carouselCommonProps.style as any), scrollSnapType: "x mandatory" }}
           >
             {genresUI.map((genre, idx) => (
               <div
@@ -751,11 +809,8 @@ const WavefyBrowser: React.FC = () => {
           </div>
           <div
             ref={artistsRef}
-            className="flex gap-4 overflow-x-auto py-2 px-1 scroll-smooth hide-scrollbar"
-            style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
-            onTouchStart={handleCarouselTouchStart}
-            onTouchMove={handleCarouselTouchMove}
-            onTouchEnd={handleCarouselTouchEnd}
+            {...carouselCommonProps}
+            style={{ ...(carouselCommonProps.style as any), scrollSnapType: "x mandatory" }}
           >
             {artistsUI.map((artist) => (
               <div
@@ -821,11 +876,8 @@ const WavefyBrowser: React.FC = () => {
           </div>
           <div
             ref={newReleasesRef}
-            className="flex gap-4 overflow-x-auto py-2 px-1 scroll-smooth hide-scrollbar"
-            style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
-            onTouchStart={handleCarouselTouchStart}
-            onTouchMove={handleCarouselTouchMove}
-            onTouchEnd={handleCarouselTouchEnd}
+            {...carouselCommonProps}
+            style={{ ...(carouselCommonProps.style as any), scrollSnapType: "x mandatory" }}
           >
             {newReleases.map((release, idx) => {
               const isCurrentSong = playlist[currentIndex]?.audio === release.audio;
