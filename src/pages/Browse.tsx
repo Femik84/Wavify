@@ -1,4 +1,4 @@
- import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import MobileSidebar from "../components/MobileSidebar";
@@ -33,15 +33,19 @@ import LoadingSkeleton from "../components/LoadingSkeleton";
 import BrowserSearch from "../components/BrowseSearch";
 
 /**
- * Notes about behavioral fixes applied:
- * - Ensure "smooth scrolling" is enabled globally while this component is mounted.
- * - Add a click handler on the page wrapper that scrolls to top smoothly when the user
- *   clicks on non-interactive parts of the page (so clicks on cards/buttons/links are not intercepted).
- * - Improve touch responsiveness so vertical page pans work even when starting gestures over card carousels:
- *   - main wrapper uses `touch-action: pan-y`
- *   - horizontal carousels use `touch-action: pan-x` and `-webkit-overflow-scrolling: touch`
+ * Fixes applied (behavior-only, no UI changes):
+ * - Implement touch handlers for horizontal carousels so vertical scrolling always works
+ *   when the user intends to scroll vertically even if the touch starts on a horizontal card area.
+ * - Keep smooth scrolling enabled while component is mounted.
+ * - Maintain existing visual markup and styles.
  *
- * UI markup and appearance are preserved (no visual/layout changes).
+ * Approach:
+ * - Add a shared touch-state ref to detect gesture direction on touchstart/touchmove.
+ * - When movement is predominantly horizontal, we perform manual horizontal scroll and preventDefault
+ *   to stop the page from scrolling vertically.
+ * - When movement is predominantly vertical, we let the browser handle the scroll (no preventDefault).
+ *
+ * This resolves the issue where users had to touch another part of the page to scroll.
  */
 
 // Utility function to safely get artist name
@@ -65,6 +69,7 @@ const WavefyBrowser: React.FC = () => {
   const artistsRef = useRef<HTMLDivElement | null>(null);
   const genresRef = useRef<HTMLDivElement | null>(null);
   const newReleasesRef = useRef<HTMLDivElement | null>(null);
+  const featuredRef = useRef<HTMLDivElement | null>(null);
 
   // Data loaded from backend
   const [featuredPlaylists, setFeaturedPlaylists] = useState<Playlist[]>([]);
@@ -291,7 +296,6 @@ const WavefyBrowser: React.FC = () => {
 
   // Global click-to-scroll behavior:
   // Scroll to top smoothly when clicking on non-interactive parts of the page.
-  // This avoids intercepting clicks on buttons/links/cards.
   useEffect(() => {
     const previous = document.documentElement.style.scrollBehavior;
     // enable smooth scrolling while mounted
@@ -325,6 +329,63 @@ const WavefyBrowser: React.FC = () => {
     }
   }
 
+  // --- Touch gesture handling for horizontal carousels ---
+  // Shared touch state used for all carousels.
+  const touchStateRef = useRef<{
+    startX: number;
+    startY: number;
+    lastX: number;
+    isHorizontal: boolean | null;
+  }>({ startX: 0, startY: 0, lastX: 0, isHorizontal: null });
+
+  function handleCarouselTouchStart(e: React.TouchEvent) {
+    const t = e.touches[0];
+    touchStateRef.current.startX = t.clientX;
+    touchStateRef.current.startY = t.clientY;
+    touchStateRef.current.lastX = t.clientX;
+    touchStateRef.current.isHorizontal = null;
+  }
+
+  function handleCarouselTouchMove(e: React.TouchEvent) {
+    const t = e.touches[0];
+    const s = touchStateRef.current;
+    const deltaX = t.clientX - s.lastX;
+    const totalDx = t.clientX - s.startX;
+    const totalDy = t.clientY - s.startY;
+
+    // If direction undecided, decide based on initial movement
+    if (s.isHorizontal === null) {
+      // small threshold to avoid jitter
+      const threshold = 6;
+      if (Math.abs(totalDx) > threshold || Math.abs(totalDy) > threshold) {
+        s.isHorizontal = Math.abs(totalDx) > Math.abs(totalDy);
+      } else {
+        // not enough movement yet
+        s.lastX = t.clientX;
+        return;
+      }
+    }
+
+    if (s.isHorizontal) {
+      // user intends horizontal scroll: perform manual scroll and prevent vertical page scroll
+      e.preventDefault();
+      const el = e.currentTarget as HTMLElement | null;
+      if (el) {
+        // invert deltaX to match natural scrolling
+        el.scrollLeft -= deltaX;
+      }
+      s.lastX = t.clientX;
+    } else {
+      // user intends vertical scroll: do nothing and allow default browser behavior
+      // update lastX so future horizontal calculation isn't skewed
+      s.lastX = t.clientX;
+    }
+  }
+
+  function handleCarouselTouchEnd() {
+    touchStateRef.current.isHorizontal = null;
+  }
+
   // Loading / error states UI
   if (loading) {
     return <LoadingSkeleton isDark={isDark} />;
@@ -347,8 +408,7 @@ const WavefyBrowser: React.FC = () => {
   }
 
   return (
-    // Important: touchAction: 'pan-y' allows vertical scrolling to start even when gesture begins over cards
-    // The onClick handler triggers scroll-to-top on non-interactive clicks (no UI changes).
+    // Keep touchAction: 'pan-y' on the main container so vertical pans start reliably.
     <div
       className={`min-h-screen ${bgColor} ${textPrimary} transition-colors duration-300 pb-20 lg:pb-29`}
       onClick={handleGlobalClick}
@@ -365,7 +425,6 @@ const WavefyBrowser: React.FC = () => {
       <Header isDark={isDark} setIsDark={setIsDark} setSidebarOpen={setSidebarOpen} />
 
       <main className="max-w-7xl mx-auto px-6 py-4 space-y-7 lg:space-y-12">
-
         {/* Search (mobile only) */}
         <div className="block lg:hidden">
           <BrowserSearch isDark={isDark} />
@@ -443,9 +502,12 @@ const WavefyBrowser: React.FC = () => {
               </div>
               <div
                 ref={trendingRef}
-                className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
-                // allow horizontal pans for these carousels specifically
-                style={{ scrollSnapType: "x mandatory", touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
+                // Removed forced touch-action: pan-x so vertical pans can begin when appropriate.
+                className="flex gap-4 overflow-x-auto py-2 px-1 scroll-smooth hide-scrollbar"
+                style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+                onTouchStart={handleCarouselTouchStart}
+                onTouchMove={handleCarouselTouchMove}
+                onTouchEnd={handleCarouselTouchEnd}
               >
                 {trendingSongs.map((song, idx) => {
                   const isCurrentSong = playlist[currentIndex]?.audio === song.audio;
@@ -508,8 +570,12 @@ const WavefyBrowser: React.FC = () => {
             </div>
 
             <div
-              className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
-              style={{ scrollSnapType: "x mandatory", touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
+              ref={featuredRef}
+              className="flex gap-4 overflow-x-auto py-2 px-1 scroll-smooth hide-scrollbar"
+              style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+              onTouchStart={handleCarouselTouchStart}
+              onTouchMove={handleCarouselTouchMove}
+              onTouchEnd={handleCarouselTouchEnd}
             >
               {featuredPlaylists.map((playlistItem) => (
                 <div
@@ -542,8 +608,11 @@ const WavefyBrowser: React.FC = () => {
               <h3 className={`text-2xl font-bold ${textPrimary}`}>Trending Now</h3>
             </div>
             <div
-              className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
-              style={{ touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
+              className="flex gap-4 overflow-x-auto py-2 px-1 scroll-smooth hide-scrollbar"
+              style={{ WebkitOverflowScrolling: "touch" }}
+              onTouchStart={handleCarouselTouchStart}
+              onTouchMove={handleCarouselTouchMove}
+              onTouchEnd={handleCarouselTouchEnd}
             >
               {trendingSongs.map((song, idx) => {
                 const isCurrentSong = playlist[currentIndex]?.audio === song.audio;
@@ -616,8 +685,11 @@ const WavefyBrowser: React.FC = () => {
           </div>
           <div
             ref={genresRef}
-            className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
-            style={{ scrollSnapType: "x mandatory", touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
+            className="flex gap-4 overflow-x-auto py-2 px-1 scroll-smooth hide-scrollbar"
+            style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+            onTouchStart={handleCarouselTouchStart}
+            onTouchMove={handleCarouselTouchMove}
+            onTouchEnd={handleCarouselTouchEnd}
           >
             {genresUI.map((genre, idx) => (
               <div
@@ -679,8 +751,11 @@ const WavefyBrowser: React.FC = () => {
           </div>
           <div
             ref={artistsRef}
-            className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
-            style={{ scrollSnapType: "x mandatory", touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
+            className="flex gap-4 overflow-x-auto py-2 px-1 scroll-smooth hide-scrollbar"
+            style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+            onTouchStart={handleCarouselTouchStart}
+            onTouchMove={handleCarouselTouchMove}
+            onTouchEnd={handleCarouselTouchEnd}
           >
             {artistsUI.map((artist) => (
               <div
@@ -746,8 +821,11 @@ const WavefyBrowser: React.FC = () => {
           </div>
           <div
             ref={newReleasesRef}
-            className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
-            style={{ scrollSnapType: "x mandatory", touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
+            className="flex gap-4 overflow-x-auto py-2 px-1 scroll-smooth hide-scrollbar"
+            style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}
+            onTouchStart={handleCarouselTouchStart}
+            onTouchMove={handleCarouselTouchMove}
+            onTouchEnd={handleCarouselTouchEnd}
           >
             {newReleases.map((release, idx) => {
               const isCurrentSong = playlist[currentIndex]?.audio === release.audio;
