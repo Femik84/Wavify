@@ -196,12 +196,12 @@ export default function Library() {
   // Sort liked songs based on selected criteria
   const sortedLikedSongs = React.useMemo(() => {
     const songs = [...likedSongs];
-    
+
     switch (sortBy) {
       case "title":
         return songs.sort((a, b) => a.title.localeCompare(b.title));
       case "artist":
-        return songs.sort((a, b) => 
+        return songs.sort((a, b) =>
           getArtistName(a.artist).localeCompare(getArtistName(b.artist))
         );
       case "recent":
@@ -241,7 +241,7 @@ export default function Library() {
         setFavoriteArtists(cached.favoriteArtists);
         setRecentlyPlayed(cached.recentlyPlayed);
         setLoading(false);
-        
+
         // Initialize audio service with cached data
         const svcState = audioService.getState();
         if (
@@ -318,14 +318,14 @@ export default function Library() {
     if (!sortedLikedSongs || sortedLikedSongs.length === 0) return;
     const idx = Math.max(0, Math.min(index, sortedLikedSongs.length - 1));
     const song = sortedLikedSongs[idx];
-    
+
     setPlaylist(sortedLikedSongs, idx);
     playTrackAtIndex(idx);
 
     // Optimistically update recently played
     const newRecent = [song, ...recentlyPlayed.filter(s => s.id !== song.id)].slice(0, 8);
     setRecentlyPlayed(newRecent);
-    
+
     // Save to localStorage immediately
     saveLibraryCache({
       likedSongs,
@@ -362,7 +362,7 @@ export default function Library() {
       // Optimistically update recently played
       const newRecent = [item, ...recentlyPlayed.filter(s => s.id !== item.id)].slice(0, 8);
       setRecentlyPlayed(newRecent);
-      
+
       // Save to localStorage immediately
       saveLibraryCache({
         likedSongs,
@@ -483,7 +483,7 @@ export default function Library() {
               >
                 <SlidersHorizontal className={`w-5 h-5 ${textSecondary}`} />
               </button>
-              
+
               {showSortMenu && (
                <div className={`absolute right-0 mt-2 w-48 ${isDark ? 'bg-zinc-900' : 'bg-white'} rounded-lg shadow-2xl border ${chartContainerBorder} overflow-hidden z-50`}>
                   <div className={`p-2 border-b ${chartContainerBorder}`}>
@@ -526,26 +526,34 @@ export default function Library() {
 
           <div className={`${chartContainerBg} rounded-xl p-6 border ${chartContainerBorder} shadow-lg`}>
             <div className="space-y-3">
-              {sortedLikedSongs.map((song, index) => {
-                const isCurrentSong = playlist[currentIndex]?.audio === song.audio;
-                const isThisSongPlaying = isCurrentSong && isPlaying;
+              {sortedLikedSongs.length === 0 ? (
+                <div className="text-center py-12">
+                  <Play className={`w-16 h-16 ${textSecondary} mx-auto mb-4`} />
+                  <p className={`${textSecondary} text-lg`}>No liked songs yet</p>
+                  <p className={`${textSecondary} text-sm mt-2`}>Tap the heart on any song to add it to your liked songs.</p>
+                </div>
+              ) : (
+                sortedLikedSongs.map((song, index) => {
+                  const isCurrentSong = playlist[currentIndex]?.audio === song.audio;
+                  const isThisSongPlaying = isCurrentSong && isPlaying;
 
-                return (
-                  <div
-                    key={song.id}
-                    onMouseEnter={() => setHoveredCard(`liked-${index}`)}
-                    onMouseLeave={() => setHoveredCard(null)}
-                  >
-                    <SongListItem
-                      song={song}
-                      index={index}
-                      isPlaying={isThisSongPlaying}
-                      isDark={isDark}
-                      onPlay={() => handlePlaySong(index)}
-                    />
-                  </div>
-                );
-              })}
+                  return (
+                    <div
+                      key={song.id}
+                      onMouseEnter={() => setHoveredCard(`liked-${index}`)}
+                      onMouseLeave={() => setHoveredCard(null)}
+                    >
+                      <SongListItem
+                        song={song}
+                        index={index}
+                        isPlaying={isThisSongPlaying}
+                        isDark={isDark}
+                        onPlay={() => handlePlaySong(index)}
+                      />
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         </section>

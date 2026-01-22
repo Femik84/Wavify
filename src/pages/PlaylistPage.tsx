@@ -221,14 +221,15 @@ export default function PlaylistPage() {
     "";
 
   return (
-    <div className={`min-h-screen ${bgColor} ${textPrimary} transition-colors duration-300 pb-20 lg:pb-24`}>
+    <div className={`min-h-screen ${bgColor} ${textPrimary} transition-colors duration-300`}>
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
+
       <div className="hidden lg:flex h-[calc(100vh-6rem)]">
         {/* Left Side - Trending Now */}
         <div className={`${cardBg} w-1/3 border-r ${borderColor} overflow-y-auto scrollbar-hide`}>
-          <style>{`
-            .scrollbar-hide::-webkit-scrollbar { display: none; }
-          `}</style>
-
           <div className="p-6 sticky top-0 bg-opacity-95 backdrop-blur z-10" style={{
             background: isDark ? 'rgba(24, 24, 27, 0.95)' : 'rgba(255, 255, 255, 0.95)'
           }}>
@@ -385,9 +386,10 @@ export default function PlaylistPage() {
         </div>
       </div>
 
-      {/* Mobile View */}
-      <div className="lg:hidden">
-        <div className="relative h-80">
+      {/* Mobile View - Fixed Header with Scrollable Content */}
+      <div className="lg:hidden h-screen flex flex-col">
+        {/* Fixed Header */}
+        <div className="relative h-72 shrink-0">
           <img src={imageSrc} alt={title} className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-linear-to-b from-black/40 via-black/60 to-black" />
 
@@ -425,7 +427,8 @@ export default function PlaylistPage() {
           </div>
         </div>
 
-        <div className="px-6 pt-6 pb-12">
+        {/* Scrollable Songs List */}
+        <div className="flex-1 overflow-y-auto px-6 pt-6 pb-24 scrollbar-hide">
           <div className="space-y-2">
             {entitySongs.map((song, index) => {
               const isCurrentSong = playlist[currentIndex]?.audio === song.audio;

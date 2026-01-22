@@ -21,8 +21,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       // ignore
     }
-    // default to light on first open
-    return "light";
+    // default to dark on first open
+    return "dark";
   });
 
   useEffect(() => {

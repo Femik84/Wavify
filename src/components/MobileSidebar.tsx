@@ -72,7 +72,7 @@ const MobileSidebar = forwardRef<HTMLElement | null, Props>(function MobileSideb
   return (
     <aside
       ref={asideRef}
-      className={`fixed inset-y-0 left-0 w-80 ${cardBg} z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
+      className={`fixed inset-y-0 left-0 w-72 ${cardBg} z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       } shadow-2xl`}
       // aria-hidden should reflect actual visibility: avoid hiding while a descendant still has focus
@@ -81,17 +81,17 @@ const MobileSidebar = forwardRef<HTMLElement | null, Props>(function MobileSideb
       <div className="flex flex-col h-full">
         {/* Header */}
         <div
-          className={`flex items-center justify-between p-5 border-b ${borderColor} sticky top-0 ${cardBg} z-10`}
+          className={`flex items-center justify-between p-4 border-b ${borderColor} sticky top-0 ${cardBg} z-10`}
         >
           <div className="flex items-center mt-1 gap-3">
-            <div className="w-12 h-13 rounded-lg bg-linear-to-br from-red-600 to-red-800 flex items-center justify-center shadow">
+            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-red-600 to-red-800 flex items-center justify-center shadow">
               <span className="text-white font-extrabold">W</span>
             </div>
             <div>
               <h2 className="text-2xl font-bold leading-none">
                 Wavi<span className="text-red-600">fy</span>
               </h2>
-              <p className="text-[15px] relative top-1 text-gray-400">Your music, on the go</p>
+              <p className="text-[14px] relative top-1 text-gray-400">Your music, on the go</p>
             </div>
           </div>
 
@@ -105,8 +105,8 @@ const MobileSidebar = forwardRef<HTMLElement | null, Props>(function MobileSideb
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-5 overflow-y-auto" aria-hidden={!sidebarOpen}>
-          <ul className="space-y-3">
+        <nav className="flex-1 p-4 overflow-y-auto" aria-hidden={!sidebarOpen}>
+          <ul className="space-y-2">
             {filteredNavItems.map((item, idx) => {
               const isActive = location.pathname === item.href;
               const keyName = item.name.toLowerCase();
@@ -126,25 +126,25 @@ const MobileSidebar = forwardRef<HTMLElement | null, Props>(function MobileSideb
                       } catch {}
                       setSidebarOpen(false);
                     }}
-                    className={`w-full text-left flex items-center gap-4 px-4 py-3 rounded-xl transition group focus:outline-none ${
+                    className={`w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg transition group focus:outline-none ${
                       isActive
-                        ? "bg-red-600 text-white shadow-lg shadow-red-600/20"
+                        ? "bg-red-600 text-white shadow-md shadow-red-600/20"
                         : `${hoverBg} ${textPrimary}`
                     }`}
                     aria-current={isActive ? "page" : undefined}
                   >
                     <span
-                      className={`flex items-center justify-center w-10 h-10 rounded-lg ${
+                      className={`flex items-center justify-center w-9 h-9 rounded-lg ${
                         isActive ? "bg-white/10" : "bg-transparent"
                       }`}
                     >
                       <Icon
-                        className={`w-6 h-6 ${isActive ? "text-white" : "text-red-600"}`}
+                        className={`w-5 h-5 ${isActive ? "text-white" : "text-red-600"}`}
                         {...(Icon === LucideHome ? { strokeWidth: 0, fill: "currentColor" } : {})}
                       />
                     </span>
 
-                    <span className="flex-1 font-semibold text-xl">{item.name}</span>
+                    <span className="flex-1 font-semibold text-lg">{item.name}</span>
                   </button>
                 </li>
               );
@@ -153,12 +153,12 @@ const MobileSidebar = forwardRef<HTMLElement | null, Props>(function MobileSideb
         </nav>
 
         {/* Footer / Profile */}
-        <div className={`p-5 border-t ${borderColor}`}>
+        <div className={`p-4 border-t ${borderColor}`}>
           <div
-            className={`flex items-center gap-4 rounded-xl p-4 ${isDark ? "bg-zinc-800" : "bg-gray-100"}`}
+            className={`flex items-center gap-3 rounded-lg p-3 ${isDark ? "bg-zinc-800" : "bg-gray-100"}`}
           >
-            <div className="w-12 h-12 rounded-full bg-linear-to-br from-red-600 to-red-800 flex items-center justify-center shadow">
-              <span className="text-white font-bold text-lg">{userInitials}</span>
+            <div className="w-10 h-10 rounded-full bg-linear-to-br from-red-600 to-red-800 flex items-center justify-center shadow">
+              <span className="text-white font-bold text-sm">{userInitials}</span>
             </div>
 
             <div className="flex-1 min-w-0">
@@ -178,7 +178,7 @@ const MobileSidebar = forwardRef<HTMLElement | null, Props>(function MobileSideb
                   } catch {}
                   setSidebarOpen(false);
                 }}
-                className={`px-4 py-2 rounded-lg font-semibold text-sm transition ${isDark ? "bg-zinc-700" : "bg-white"} ${hoverBg}`}
+                className={`px-3 py-1.5 rounded-lg font-semibold text-sm transition ${isDark ? "bg-zinc-700" : "bg-white"} ${hoverBg}`}
               >
                 Profile
               </button>

@@ -50,56 +50,96 @@ export default function WavifySignin() {
     }
   };
 
+  const handleSignUpClick = () => {
+    window.location.href = '/signup';
+  };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 overflow-hidden relative">
-      {/* Clean Background */}
-      <div className="absolute inset-0 bg-linear-to-br from-gray-50 via-white to-red-50" />
+    <div className="min-h-screen lg:h-screen w-full bg-gray-950 text-white overflow-y-auto lg:overflow-hidden relative">
+      {/* Dark Background with Music Theme */}
+      <div className="absolute inset-0">
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-gray-950 to-black z-10" />
+        
+        {/* Abstract Music Background Pattern */}
+        <div className="absolute inset-0 opacity-20">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="music-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                <circle cx="25" cy="25" r="2" fill="#ef4444" opacity="0.3" />
+                <circle cx="75" cy="75" r="2" fill="#ef4444" opacity="0.3" />
+                <path d="M 20 40 Q 40 20 60 40 T 100 40" stroke="#ef4444" strokeWidth="0.5" fill="none" opacity="0.2" />
+                <path d="M 30 70 Q 50 50 70 70 T 110 70" stroke="#ef4444" strokeWidth="0.5" fill="none" opacity="0.2" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#music-pattern)" />
+          </svg>
+        </div>
+
+        {/* Glowing Orbs */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        
+        {/* Animated Soundwave Background */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 opacity-10 flex items-end justify-center">
+          {[...Array(50)].map((_, i) => (
+            <div
+              key={i}
+              className="w-1 bg-linear-to-t from-red-600 to-transparent mx-1 animate-pulse"
+              style={{
+                height: `${Math.random() * 80 + 20}%`,
+                animationDelay: `${i * 0.1}s`,
+                animationDuration: `${1 + Math.random() * 2}s`
+              }}
+            />
+          ))}
+        </div>
+      </div>
 
       {/* Main Container */}
-      <div className="relative min-h-screen flex items-center justify-center p-4 lg:p-8">
+      <div className="relative min-h-screen lg:h-full w-full flex items-center justify-center px-4 py-8 lg:py-0 lg:px-8 z-20">
         <div className="w-full max-w-7xl grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           
-          {/* Left Panel - Ferrari Inspired Graphic */}
+          {/* Left Panel - Brand & Features */}
           <div className="relative order-2 lg:order-1">
-            <div className="relative p-8 lg:p-12">
-              {/* Glowing Orb */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 lg:w-96 lg:h-96 bg-red-500 rounded-full blur-3xl opacity-10 animate-pulse" />
+            <div className="relative p-6 lg:p-8">
+              {/* Glowing Accent */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 lg:w-80 lg:h-80 bg-red-600/20 rounded-full blur-3xl animate-pulse" />
               
               {/* Content */}
-              <div className="relative z-10 space-y-8">
+              <div className="relative z-10 space-y-6">
                 {/* Logo Area */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   <div className="relative">
-                    <div className="w-16 h-16 lg:w-20 lg:h-20 bg-linear-to-br from-red-600 to-red-700 rounded-2xl flex items-center justify-center shadow-2xl shadow-red-600/30">
-                      <Music className="w-8 h-8 lg:w-10 lg:h-10 text-white" />
+                    <div className="w-14 h-14 lg:w-16 lg:h-16 bg-linear-to-br from-red-600 to-red-700 rounded-2xl flex items-center justify-center shadow-2xl shadow-red-600/50">
+                      <Music className="w-7 h-7 lg:w-8 lg:h-8 text-white" />
                     </div>
-                    <div className="absolute -inset-1 bg-linear-to-br from-red-600 to-red-700 rounded-2xl blur opacity-40 animate-pulse" />
+                    <div className="absolute -inset-1 bg-linear-to-br from-red-600 to-red-700 rounded-2xl blur opacity-50 animate-pulse" />
                   </div>
                   <div>
-                    <h1 className="text-4xl lg:text-6xl font-black bg-linear-to-r from-gray-900 via-red-600 to-red-700 bg-clip-text text-transparent">
+                    <h1 className="text-3xl lg:text-5xl font-black bg-linear-to-r from-white via-red-400 to-red-600 bg-clip-text text-transparent">
                       Wavify
                     </h1>
-                    <p className="text-red-600 text-sm lg:text-base font-semibold tracking-wider">PREMIUM AUDIO</p>
+                    <p className="text-red-500 text-xs lg:text-sm font-semibold tracking-wider">PREMIUM AUDIO</p>
                   </div>
                 </div>
 
                 {/* Headline */}
-                <div className="space-y-4">
-                  <h2 className="text-3xl lg:text-5xl font-black leading-tight text-gray-900">
+                <div className="space-y-3">
+                  <h2 className="text-2xl lg:text-4xl font-black leading-tight text-white">
                     Welcome Back
                     <br />
-                    <span className="bg-linear-to-r from-red-600 via-red-700 to-red-800 bg-clip-text text-transparent">
+                    <span className="bg-linear-to-r from-red-500 via-red-600 to-red-700 bg-clip-text text-transparent">
                       To Your Music
                     </span>
                   </h2>
-                  <p className="text-gray-600 text-base lg:text-lg max-w-md">
+                  <p className="text-gray-400 text-sm lg:text-base max-w-md">
                     Continue your premium audio experience. Your favorite tracks are waiting for you.
                   </p>
                 </div>
 
                 {/* Features */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {[
                     { icon: Headphones, text: 'Hi-Res Lossless Audio' },
                     { icon: Music, text: '100M+ Premium Tracks' },
@@ -107,12 +147,12 @@ export default function WavifySignin() {
                   ].map((feature, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-4 group cursor-pointer"
+                      className="flex items-center gap-3 group cursor-pointer"
                     >
-                      <div className="w-12 h-12 bg-linear-to-br from-red-50 to-red-100 backdrop-blur-sm rounded-xl flex items-center justify-center border border-red-200 group-hover:border-red-400 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-red-600/20">
-                        <feature.icon className="w-5 h-5 text-red-600 group-hover:text-red-700 transition-colors" />
+                      <div className="w-10 h-10 bg-linear-to-br from-red-950/50 to-red-900/30 backdrop-blur-sm rounded-xl flex items-center justify-center border border-red-800/30 group-hover:border-red-600/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-red-600/30">
+                        <feature.icon className="w-4 h-4 text-red-500 group-hover:text-red-400 transition-colors" />
                       </div>
-                      <span className="text-gray-700 group-hover:text-gray-900 transition-colors font-medium">
+                      <span className="text-gray-300 group-hover:text-white transition-colors font-medium text-sm lg:text-base">
                         {feature.text}
                       </span>
                     </div>
@@ -120,7 +160,7 @@ export default function WavifySignin() {
                 </div>
 
                 {/* Decorative Lines */}
-                <div className="space-y-2 pt-8">
+                <div className="space-y-2 pt-4">
                   {[...Array(3)].map((_, i) => (
                     <div
                       key={i}
@@ -132,15 +172,15 @@ export default function WavifySignin() {
               </div>
 
               {/* Waveform Decoration */}
-              <div className="absolute bottom-0 right-0 opacity-10 pointer-events-none">
-                <svg width="300" height="150" viewBox="0 0 300 150">
-                  {[...Array(50)].map((_, i) => (
+              <div className="absolute bottom-0 right-0 opacity-20 pointer-events-none">
+                <svg width="250" height="120" viewBox="0 0 250 120">
+                  {[...Array(40)].map((_, i) => (
                     <rect
                       key={i}
                       x={i * 6}
-                      y={75 - Math.random() * 60}
+                      y={60 - Math.random() * 50}
                       width="3"
-                      height={Math.random() * 60 + 30}
+                      height={Math.random() * 50 + 25}
                       fill="currentColor"
                       className="text-red-600"
                       opacity={0.3 + Math.random() * 0.4}
@@ -153,37 +193,37 @@ export default function WavifySignin() {
 
           {/* Right Panel - Signin Form */}
           <div className="relative order-1 lg:order-2">
-            <div className="relative bg-white/80 backdrop-blur-2xl rounded-3xl p-8 lg:p-12 border border-gray-200 shadow-2xl shadow-gray-900/10">
+            <div className="relative bg-gray-900/80 backdrop-blur-2xl rounded-3xl p-6 lg:p-10 border border-gray-800 shadow-2xl shadow-black/50">
               {/* Glow Effect */}
-              <div className="absolute -inset-0.5 bg-linear-to-br from-red-200/40 via-transparent to-red-300/40 rounded-3xl blur opacity-60" />
+              <div className="absolute -inset-0.5 bg-linear-to-br from-red-600/20 via-transparent to-red-700/20 rounded-3xl blur opacity-60" />
               
-              <div className="relative space-y-8">
+              <div className="relative space-y-6">
                 {/* Form Header */}
-                <div className="text-center space-y-2">
-                  <h3 className="text-2xl lg:text-3xl font-bold text-gray-900">Sign In</h3>
-                  <p className="text-gray-600">Access your premium account</p>
+                <div className="text-center space-y-1">
+                  <h3 className="text-xl lg:text-2xl font-bold text-white">Sign In</h3>
+                  <p className="text-gray-400 text-sm">Access your premium account</p>
                 </div>
 
                 {/* Success Message */}
                 {success && (
-                  <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm">
+                  <div className="bg-green-950/50 border border-green-800/50 text-green-400 px-4 py-2.5 rounded-xl text-sm">
                     Login successful! Redirecting to home...
                   </div>
                 )}
 
                 {/* Error Message */}
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                  <div className="bg-red-950/50 border border-red-800/50 text-red-400 px-4 py-2.5 rounded-xl text-sm">
                     {error}
                   </div>
                 )}
 
                 {/* Form Fields */}
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {/* Email Input */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-red-600" />
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-gray-300 flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-red-500" />
                       Email Address
                     </label>
                     <input
@@ -192,14 +232,14 @@ export default function WavifySignin() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@example.com"
                       disabled={loading}
-                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-gray-950/50 border border-gray-800 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                   </div>
 
                   {/* Password Input */}
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                      <Lock className="w-4 h-4 text-red-600" />
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-gray-300 flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-red-500" />
                       Password
                     </label>
                     <input
@@ -208,7 +248,7 @@ export default function WavifySignin() {
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
                       disabled={loading}
-                      className="w-full bg-white border border-gray-300 rounded-xl px-4 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-gray-950/50 border border-gray-800 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                   </div>
 
@@ -218,12 +258,12 @@ export default function WavifySignin() {
                       <input
                         type="checkbox"
                         disabled={loading}
-                        className="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-600 focus:ring-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-4 h-4 rounded border-gray-700 bg-gray-950/50 text-red-600 focus:ring-red-600 focus:ring-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       />
-                      <span className="text-gray-600 group-hover:text-gray-900 transition-colors">Remember me</span>
+                      <span className="text-gray-400 group-hover:text-gray-200 transition-colors">Remember me</span>
                     </label>
                     <button 
-                      className="text-red-600 hover:text-red-700 font-semibold transition-colors disabled:opacity-50"
+                      className="text-red-500 hover:text-red-400 font-semibold transition-colors disabled:opacity-50"
                       disabled={loading}
                     >
                       Forgot Password?
@@ -234,7 +274,7 @@ export default function WavifySignin() {
                   <button
                     onClick={handleSubmit}
                     disabled={loading || success}
-                    className="w-full bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-red-600/30 hover:shadow-red-600/50 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 group mt-8 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    className="w-full bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3.5 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-red-600/40 hover:shadow-red-600/60 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 group mt-6 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
                     {loading ? (
                       <>
@@ -258,14 +298,11 @@ export default function WavifySignin() {
                 </div>
 
                 {/* Footer */}
-                <p className="text-center text-sm text-gray-600">
+                <p className="text-center text-sm text-gray-400">
                   Don't have an account?{" "}
                   <button
-                    onClick={() => {
-                      // In your actual app: navigate("/signup")
-                      alert('Navigate to sign up page');
-                    }}
-                    className="text-red-600 hover:text-red-700 font-semibold transition-colors"
+                    onClick={handleSignUpClick}
+                    className="text-red-500 hover:text-red-400 font-semibold transition-colors"
                     disabled={loading}
                   >
                     Sign Up

@@ -25,37 +25,52 @@ export default function NowPlaying() {
 
   const currentTrack = playlist?.[currentIndex];
 
+  // Prevent body scroll while NowPlaying is mounted so the page does not scroll
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
+
   // Sync URL with current track
   useEffect(() => {
     if (playlist && playlist.length > 0 && playlist[currentIndex]) {
       const currentTrack = playlist[currentIndex];
       const urlIndex = searchParams.get("track");
-      
+
       if (urlIndex !== currentIndex.toString()) {
-        setSearchParams({ 
-          track: currentIndex.toString(),
-          title: encodeURIComponent(currentTrack.title),
-          artist: encodeURIComponent(getArtistName(currentTrack.artist))
-        }, { replace: true });
+        setSearchParams(
+          {
+            track: currentIndex.toString(),
+            title: encodeURIComponent(currentTrack.title),
+            artist: encodeURIComponent(getArtistName(currentTrack.artist)),
+          },
+          { replace: true }
+        );
       }
     }
-  }, [currentIndex, playlist, searchParams, setSearchParams]);
+    // intentionally not including `searchParams` in deps to avoid extra runs
+  }, [currentIndex, playlist, setSearchParams]);
 
   // Load track from URL on mount or redirect if no playlist
   useEffect(() => {
     const trackIndex = searchParams.get("track");
-    
+
     if (!playlist || playlist.length === 0) {
       navigate("/", { replace: true });
       return;
     }
-    
+
     if (trackIndex) {
       const index = parseInt(trackIndex);
       if (!isNaN(index) && index >= 0 && index < playlist.length && index !== currentIndex) {
         playTrackAtIndex(index);
       }
     }
+    // run only on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Check if current track is liked
@@ -122,72 +137,70 @@ export default function NowPlaying() {
   }
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-linear-to-b from-gray-900 via-gray-900 to-black" : "bg-linear-to-b from-gray-100 via-white to-gray-50"}`}>
-      <div className="relative h-screen flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 z-10">
-          <button 
-            onClick={() => navigate(-1)} 
-            className={`p-2 rounded-full transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`}
+    // Make the Now Playing screen fixed and non-scrollable. overflow-hidden prevents inner scrollbars.
+    <div
+      className={`fixed inset-0 overflow-hidden ${isDark ? "bg-linear-to-b from-gray-900 via-gray-900 to-black" : "bg-linear-to-b from-gray-100 via-white to-gray-50"}`}
+    >
+      {/* Use full-height flex column so content is constrained to viewport. */}
+      <div className="flex flex-col h-full">
+        {/* Header (does not grow) */}
+        <div className="flex items-center justify-between p-3 z-10 flex-none">
+          <button
+            onClick={() => navigate(-1)}
+            className={`p-2 rounded-full transition-colors ${isDark ? "hover:bg-white/8" : "hover:bg-black/5"}`}
           >
-            <ChevronDown className={`w-6 h-6 ${isDark ? "text-white" : "text-gray-900"}`} />
+            <ChevronDown className={`w-5 h-5 ${isDark ? "text-white" : "text-gray-900"}`} />
           </button>
-          <span className={`text-sm font-semibold tracking-wide uppercase ${isDark ? "text-white" : "text-gray-900"}`}>
+          <span className={`text-xs font-semibold tracking-wide uppercase ${isDark ? "text-white" : "text-gray-900"}`}>
             Now Playing
           </span>
-          <button 
-            className={`p-2 rounded-full transition-colors ${isDark ? "hover:bg-white/10" : "hover:bg-black/5"}`}
-          >
-            <MoreHorizontal className={`w-6 h-6 ${isDark ? "text-white" : "text-gray-900"}`} />
+          <button className={`p-2 rounded-full transition-colors ${isDark ? "hover:bg-white/8" : "hover:bg-black/5"}`}>
+            <MoreHorizontal className={`w-5 h-5 ${isDark ? "text-white" : "text-gray-900"}`} />
           </button>
         </div>
 
-        {/* Album Art */}
-        <div className="flex-1 flex items-center justify-center px-8 py-6">
-          <div className="w-full max-w-md">
-            <img 
-              src={currentTrack.cover} 
-              alt="Album Art" 
-              className={`w-full aspect-square rounded-lg shadow-2xl object-cover ${isDark ? "shadow-black/50" : "shadow-gray-400/30"}`}
+        {/* Album Art area: this is the flexible region but limited with max height so it never forces the page to scroll */}
+        <div className="flex-1  relative bottom-10 flex items-center justify-center px-6 py-4 overflow-hidden">
+          <div className="w-full max-w-sm">
+            <img
+              src={currentTrack.cover}
+              alt="Album Art"
+              className={`w-full rounded-lg shadow-2xl object-cover ${isDark ? "shadow-black/50" : "shadow-gray-400/25"}`}
+              // ensure the poster never grows beyond a reasonable portion of the viewport
+              style={{ maxHeight: "45vh", height: "250px" }}
             />
           </div>
         </div>
 
-        {/* Track Info & Controls */}
-        <div className="px-8 pb-8 space-y-6">
+        {/* Track Info & Controls (fixed height region) */}
+        <div className="relative bottom-25 px-6 pb-6 flex-none space-y-5">
           {/* Track Info */}
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
-              <h1 className={`text-2xl font-bold mb-1 truncate ${isDark ? "text-white" : "text-gray-900"}`}>
+              <h1 className={`text-xl font-semibold mb-1 truncate ${isDark ? "text-white" : "text-gray-900"}`}>
                 {currentTrack.title}
               </h1>
-              <p className={`text-base truncate ${isDark ? "text-gray-400" : "text-gray-600"}`}>
-                {getArtistName(currentTrack.artist)}
-              </p>
+              <p className={`text-sm truncate ${isDark ? "text-gray-400" : "text-gray-600"}`}>{getArtistName(currentTrack.artist)}</p>
             </div>
-            <button 
+            <button
               onClick={handleLikeToggle}
               disabled={isLikeLoading}
-              className={`p-2 ml-4 transition-all rounded-full ${
-                isDark ? "hover:bg-white/10" : "hover:bg-black/5"
-              } ${isLikeLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`p-2 ml-3 transition-all rounded-full ${isDark ? "hover:bg-white/8" : "hover:bg-black/5"} ${
+                isLikeLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              <Heart 
-                className={`w-6 h-6 transition-all ${
-                  isLiked 
-                    ? "text-red-500 fill-red-500" 
-                    : isDark 
-                      ? "text-gray-400 hover:text-white" 
-                      : "text-gray-600 hover:text-gray-900"
-                }`} 
+              <Heart
+                className={`w-5 h-5 transition-all ${
+                  isLiked ? "text-red-500 fill-red-500" : isDark ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"
+                }`}
               />
             </button>
           </div>
 
           {/* Progress Bar */}
           <div className="space-y-2">
-            <div 
-              className={`w-full h-1 rounded-full cursor-pointer group ${isDark ? "bg-gray-700" : "bg-gray-300"}`}
+            <div
+              className={`w-full h-0.5 rounded-full cursor-pointer group ${isDark ? "bg-gray-700" : "bg-gray-300"}`}
               onClick={(e) => {
                 const el = e.currentTarget as HTMLDivElement;
                 const rect = el.getBoundingClientRect();
@@ -196,13 +209,8 @@ export default function NowPlaying() {
                 seekTo(percent);
               }}
             >
-              <div 
-                className={`h-full rounded-full relative transition-all ${isDark ? "bg-white" : "bg-gray-900"}`}
-                style={{ width: `${progressPercent}%` }}
-              >
-                <div 
-                  className={`absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${isDark ? "bg-white" : "bg-gray-900"}`}
-                />
+              <div className={`h-full rounded-full relative transition-all ${isDark ? "bg-white" : "bg-gray-900"}`} style={{ width: `${progressPercent}%` }}>
+                <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity ${isDark ? "bg-white" : "bg-gray-900"}`} />
               </div>
             </div>
             <div className={`flex justify-between text-xs font-medium ${isDark ? "text-gray-400" : "text-gray-600"}`}>
@@ -212,50 +220,38 @@ export default function NowPlaying() {
           </div>
 
           {/* Main Controls */}
-          <div className="flex items-center justify-between max-w-md mx-auto">
-            <button 
-              onClick={() => toggleShuffle()} 
+          <div className="flex items-center justify-between max-w-sm mx-auto">
+            <button
+              onClick={() => toggleShuffle()}
               className={`p-2 rounded-full transition-all ${
-                shuffle 
-                  ? isDark ? "text-red-500 hover:text-red-400" : "text-red-600 hover:text-red-700"
-                  : isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"
+                shuffle ? (isDark ? "text-red-500 hover:text-red-400" : "text-red-600 hover:text-red-700") : isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"
               }`}
             >
-              <Shuffle className="w-5 h-5" />
+              <Shuffle className="w-4 h-4" />
             </button>
 
-            <button 
-              onClick={() => prev()} 
-              className={`p-2 transition-colors ${isDark ? "text-white hover:text-gray-300" : "text-gray-900 hover:text-gray-700"}`}
+            <button onClick={() => prev()} className={`p-2 transition-colors ${isDark ? "text-white hover:text-gray-300" : "text-gray-900 hover:text-gray-700"}`}>
+              <SkipBack className="w-6 h-6" fill="currentColor" />
+            </button>
+
+            <button
+              onClick={() => togglePlay()}
+              className={`p-3 rounded-full shadow-md transition-all hover:scale-105 ${isDark ? "bg-white text-black hover:bg-gray-100" : "bg-gray-900 text-white hover:bg-gray-800"}`}
             >
-              <SkipBack className="w-8 h-8" fill="currentColor" />
+              {isPlaying ? <Pause className="w-6 h-6" fill="currentColor" /> : <Play className="w-6 h-6" fill="currentColor" />}
             </button>
 
-            <button 
-              onClick={() => togglePlay()} 
-              className={`p-4 rounded-full shadow-xl transition-all hover:scale-105 ${
-                isDark ? "bg-white text-black hover:bg-gray-100" : "bg-gray-900 text-white hover:bg-gray-800"
-              }`}
-            >
-              {isPlaying ? <Pause className="w-7 h-7" fill="currentColor" /> : <Play className="w-7 h-7 ml-1" fill="currentColor" />}
+            <button onClick={() => next()} className={`p-2 transition-colors ${isDark ? "text-white hover:text-gray-300" : "text-gray-900 hover:text-gray-700"}`}>
+              <SkipForward className="w-6 h-6" fill="currentColor" />
             </button>
 
-            <button 
-              onClick={() => next()} 
-              className={`p-2 transition-colors ${isDark ? "text-white hover:text-gray-300" : "text-gray-900 hover:text-gray-700"}`}
-            >
-              <SkipForward className="w-8 h-8" fill="currentColor" />
-            </button>
-
-            <button 
-              onClick={() => cycleRepeat()} 
+            <button
+              onClick={() => cycleRepeat()}
               className={`p-2 rounded-full transition-all relative ${
-                repeat !== "off"
-                  ? isDark ? "text-red-500 hover:text-red-400" : "text-red-600 hover:text-red-700"
-                  : isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"
+                repeat !== "off" ? (isDark ? "text-red-500 hover:text-red-400" : "text-red-600 hover:text-red-700") : isDark ? "text-gray-400 hover:text-white" : "text-gray-500 hover:text-gray-900"
               }`}
             >
-              <Repeat className="w-5 h-5" />
+              <Repeat className="w-4 h-4" />
               {repeat === "one" && (
                 <span className={`absolute -top-0.5 -right-0.5 text-[10px] font-bold ${isDark ? "text-red-500" : "text-red-600"}`}>1</span>
               )}
@@ -263,18 +259,18 @@ export default function NowPlaying() {
           </div>
 
           {/* Volume Control */}
-          <div className="flex items-center gap-3 max-w-md mx-auto pt-2">
-            <Volume2 className={`w-5 h-5 shrink-0 ${isDark ? "text-gray-400" : "text-gray-600"}`} />
-            <input 
-              type="range" 
-              min={0} 
-              max={1} 
-              step={0.01} 
-              value={volume} 
+          <div className="flex items-center gap-3 max-w-sm mx-auto pt-2">
+            <Volume2 className={`w-4 h-4 shrink-0 ${isDark ? "text-gray-400" : "text-gray-600"}`} />
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={volume}
               onChange={(e) => setVolume(Number(e.target.value))}
               className={`flex-1 h-1 rounded-full appearance-none cursor-pointer ${
-                isDark 
-                  ? "bg-gray-700 [&::-webkit-slider-thumb]:bg-white [&::-moz-range-thumb]:bg-white" 
+                isDark
+                  ? "bg-gray-700 [&::-webkit-slider-thumb]:bg-white [&::-moz-range-thumb]:bg-white"
                   : "bg-gray-300 [&::-webkit-slider-thumb]:bg-gray-900 [&::-moz-range-thumb]:bg-gray-900"
               } [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer`}
             />

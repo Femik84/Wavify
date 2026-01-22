@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Edit2, LogOut, Play, Upload, User, FileText } from "lucide-react";
+import { ChevronLeft, ChevronRight, Edit2, LogOut, Play, Upload, User, FileText, Star } from "lucide-react";
 import Header from "../components/Header";
 import MobileSidebar from "../components/MobileSidebar";
 import Footer from "../components/Footer";
@@ -337,6 +337,13 @@ export default function Profile() {
     setEditImageFile(null);
   };
 
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    logout();
+    navigate("/login");
+  };
+
   const bgColor = isDark ? "bg-black" : "bg-gray-50";
   const textPrimary = isDark ? "text-white" : "text-gray-900";
   const textSecondary = isDark ? "text-gray-300" : "text-gray-600";
@@ -350,11 +357,6 @@ export default function Profile() {
   const displayBio = user?.bio || "Music enthusiast 🎵 | Always discovering new sounds | Living life one beat at a time";
   const displayImage = user?.image || fallbackImage;
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
   const navigateToArtist = (name: string) => {
     navigate(`/artist/${encodeURIComponent(name)}`);
   };
@@ -363,9 +365,9 @@ export default function Profile() {
     navigate(`/playlist/${encodeURIComponent(name)}`);
   };
 
- if (loading) {
-  return <LoadingSkeleton isDark={isDark} />;
-}
+  if (loading) {
+    return <LoadingSkeleton isDark={isDark} />;
+  }
 
   if (error) {
     return (
@@ -393,10 +395,10 @@ export default function Profile() {
         <section className="space-y-6 relative">
           <button
             onClick={handleLogout}
-            className="absolute -top-3 -right-3 md:top-0 md:right-0 flex items-center justify-center gap-2 p-2.5 rounded-xl bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 group border border-red-500/30"
+            className="absolute -top-3 -right-3 md:top-0 md:right-0 z-10 flex items-center justify-center gap-2 p-2.5 rounded-xl bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 border border-red-500/30"
             aria-label="Logout"
           >
-            <LogOut size={18} />
+            <LogOut size={18} className="pointer-events-none" />
           </button>
 
           <div className="flex justify-center animate-fadeIn">
@@ -419,9 +421,10 @@ export default function Profile() {
 
         <HorizontalCarousel title="Favorite Artists" items={favoriteArtists} type="artist" isDark={isDark} onItemClick={navigateToArtist} />
         {favoriteArtists.length === 0 && (
-          <div className={`text-center relative bottom-10 py-4 ${textSecondary} text-sm animate-fadeIn`}>
-            <p>You have no favorite artists yet.</p>
-            <p className="text-xs mt-2">Start exploring and add your favorites!</p>
+          <div className={`${listContainerBg} relative bottom-8 rounded-xl p-6 md:p-12 mt-2 md:mt-0 border ${listContainerBorder} shadow-lg text-center ${textSecondary} text-sm animate-fadeIn`}>
+            <Star className={`w-16 h-16 ${textSecondary} mx-auto mb-4`} />
+            <p className={`${textSecondary} text-lg`}>No favorite artists yet</p>
+            <p className={`${textSecondary} text-sm mt-2`}>Start exploring and mark artists as favorites!</p>
           </div>
         )}
         
@@ -443,7 +446,11 @@ export default function Profile() {
             <div className={`${listContainerBg} rounded-xl p-4 border ${listContainerBorder} flex-1 overflow-y-auto scrollbar-hide`}>
               <div className="space-y-2">
                 {favoriteArtists.length === 0 ? (
-                  <div className="text-center py-8 text-sm text-gray-500">You have no favorite artists yet.</div>
+                  <div className={`${listContainerBg} rounded-xl p-8 border ${listContainerBorder} shadow-lg text-center`}>
+                    <Star className={`w-12 h-12 mx-auto mb-4 ${textSecondary}`} />
+                    <p className={`${textSecondary} text-lg`}>No favorite artists yet</p>
+                    <p className={`${textSecondary} text-sm mt-2`}>Start exploring and mark artists as favorites!</p>
+                  </div>
                 ) : (
                   favoriteArtists.map((artist, idx) => (
                     <ListItem
@@ -488,7 +495,7 @@ export default function Profile() {
 
                 <div className="mt-6">
                   <button onClick={handleLogout} className={`w-xs flex relative left-6 justify-center gap-2 px-4 py-3 rounded-xl bg-linear-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 border border-red-500/30`}>
-                    <LogOut size={18} />
+                    <LogOut size={18} className="pointer-events-none" />
                     <span className="font-semibold tracking-wide">Logout</span>
                   </button>
                 </div>

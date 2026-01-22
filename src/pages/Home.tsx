@@ -227,7 +227,7 @@ async function playRecentlyPlayedAtIndex(index: number, isMobile: boolean = fals
       <MobileSidebar isDark={isDark} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       <Header isDark={isDark} setIsDark={setIsDark} setSidebarOpen={setSidebarOpen} />
 
-      <main className="max-w-7xl mx-auto px-6 py-6">
+      <main className="max-w-7xl mx-auto px-4 py-4">
         {/* Mobile Layout */}
         <div className="lg:hidden space-y-12">
 
