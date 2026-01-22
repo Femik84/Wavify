@@ -88,7 +88,7 @@ const MobileSidebar = forwardRef<HTMLElement | null, Props>(function MobileSideb
               <span className="text-white font-extrabold">W</span>
             </div>
             <div>
-              <h2 className="text-[21px] font-bold leading-none">
+              <h2 className="text-[20px] font-bold leading-none">
                 Wavi<span className="text-red-600">fy</span>
               </h2>
               <p className="text-[14px] relative top-1 text-gray-400">Your music, on the go</p>

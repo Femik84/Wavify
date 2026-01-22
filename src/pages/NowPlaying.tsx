@@ -173,7 +173,7 @@ export default function NowPlaying() {
         </div>
 
         {/* Track Info & Controls (fixed height region) */}
-        <div className="relative bottom-20 px-6 pb-6 flex-none space-y-5">
+        <div className="relative bottom-18 px-6 pb-6 flex-none space-y-5">
           {/* Track Info */}
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">

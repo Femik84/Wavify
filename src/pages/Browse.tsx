@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import MobileSidebar from "../components/MobileSidebar";
@@ -16,7 +16,7 @@ import {
   Disc,
   PlayCircle,
 } from "lucide-react";
-import api from "../utils/axios"; 
+import api from "../utils/axios";
 import {
   fetchPlaylists,
   fetchGenres,
@@ -32,12 +32,23 @@ import {
 import LoadingSkeleton from "../components/LoadingSkeleton";
 import BrowserSearch from "../components/BrowseSearch";
 
+/**
+ * Notes about behavioral fixes applied:
+ * - Ensure "smooth scrolling" is enabled globally while this component is mounted.
+ * - Add a click handler on the page wrapper that scrolls to top smoothly when the user
+ *   clicks on non-interactive parts of the page (so clicks on cards/buttons/links are not intercepted).
+ * - Improve touch responsiveness so vertical page pans work even when starting gestures over card carousels:
+ *   - main wrapper uses `touch-action: pan-y`
+ *   - horizontal carousels use `touch-action: pan-x` and `-webkit-overflow-scrolling: touch`
+ *
+ * UI markup and appearance are preserved (no visual/layout changes).
+ */
+
 // Utility function to safely get artist name
 function getArtistName(artist: any): string {
   if (!artist) return "Unknown Artist";
   return typeof artist === "string" ? artist : artist.name || "Unknown Artist";
 }
-
 
 const WavefyBrowser: React.FC = () => {
   const navigate = useNavigate();
@@ -191,43 +202,43 @@ const WavefyBrowser: React.FC = () => {
   }
 
   // Follow/unfollow handler (optimistic UI)
-async function toggleFollow(artistId: number) {
-  // Find index
-  const idx = artistsUI.findIndex((a) => a.id === artistId);
-  if (idx === -1) return;
+  async function toggleFollow(artistId: number) {
+    // Find index
+    const idx = artistsUI.findIndex((a) => a.id === artistId);
+    if (idx === -1) return;
 
-  // Optimistically update UI
-  const prev = artistsUI[idx].is_following ?? false;
-  setArtistsUI((prevList) =>
-    prevList.map((a) => (a.id === artistId ? { ...a, is_following: !prev } : a))
-  );
-
-  try {
-    if (prev) {
-      // Send DELETE request if the artist is already being followed
-      await api.delete(favoriteEndpointFor(artistId));
-    } else {
-      // Send POST request to follow the artist
-      await api.post(favoriteEndpointFor(artistId));
-    }
-  } catch (err: any) {
-    console.error("Follow/unfollow failed", err);
-
-    // Revert optimistic update
+    // Optimistically update UI
+    const prev = artistsUI[idx].is_following ?? false;
     setArtistsUI((prevList) =>
-      prevList.map((a) => (a.id === artistId ? { ...a, is_following: prev } : a))
+      prevList.map((a) => (a.id === artistId ? { ...a, is_following: !prev } : a))
     );
 
-    // If unauthorized, navigate to login
-    if (err?.response?.status === 401) {
-      navigate("/login");
-      return;
-    }
+    try {
+      if (prev) {
+        // Send DELETE request if the artist is already being followed
+        await api.delete(favoriteEndpointFor(artistId));
+      } else {
+        // Send POST request to follow the artist
+        await api.post(favoriteEndpointFor(artistId));
+      }
+    } catch (err: any) {
+      console.error("Follow/unfollow failed", err);
 
-    // Fallback user feedback
-    alert("Could not update follow state. Please try again.");
+      // Revert optimistic update
+      setArtistsUI((prevList) =>
+        prevList.map((a) => (a.id === artistId ? { ...a, is_following: prev } : a))
+      );
+
+      // If unauthorized, navigate to login
+      if (err?.response?.status === 401) {
+        navigate("/login");
+        return;
+      }
+
+      // Fallback user feedback
+      alert("Could not update follow state. Please try again.");
+    }
   }
-}
 
   // Play handlers that use loaded state arrays
   function playTrendingSongAtIndex(index: number, isMobile: boolean = false) {
@@ -278,10 +289,46 @@ async function toggleFollow(artistId: number) {
     }
   }
 
+  // Global click-to-scroll behavior:
+  // Scroll to top smoothly when clicking on non-interactive parts of the page.
+  // This avoids intercepting clicks on buttons/links/cards.
+  useEffect(() => {
+    const previous = document.documentElement.style.scrollBehavior;
+    // enable smooth scrolling while mounted
+    document.documentElement.style.scrollBehavior = "smooth";
+
+    return () => {
+      // restore previous behavior
+      document.documentElement.style.scrollBehavior = previous || "";
+    };
+  }, []);
+
+  function isInteractiveElement(el: Element | null) {
+    if (!el || !(el instanceof Element)) return false;
+    // Elements we consider interactive — avoid triggering scroll-to-top when they are clicked
+    return !!el.closest(
+      "a, button, input, textarea, select, [role='button'], [role='link'], [data-no-scroll]"
+    );
+  }
+
+  function handleGlobalClick(e: React.MouseEvent) {
+    // Only act when click target is not an interactive element
+    const target = e.target as Element | null;
+    if (!target) return;
+
+    if (!isInteractiveElement(target)) {
+      // Scroll to top immediately with smooth behavior
+      if (typeof window !== "undefined") {
+        // Use smooth behavior to match user's request to "allow smooth scrolling"
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+  }
+
   // Loading / error states UI
- if (loading) {
-  return <LoadingSkeleton isDark={isDark} />;
-}
+  if (loading) {
+    return <LoadingSkeleton isDark={isDark} />;
+  }
 
   if (error) {
     return (
@@ -300,7 +347,13 @@ async function toggleFollow(artistId: number) {
   }
 
   return (
-    <div className={`min-h-screen ${bgColor} ${textPrimary} transition-colors duration-300 pb-20 lg:pb-29`}>
+    // Important: touchAction: 'pan-y' allows vertical scrolling to start even when gesture begins over cards
+    // The onClick handler triggers scroll-to-top on non-interactive clicks (no UI changes).
+    <div
+      className={`min-h-screen ${bgColor} ${textPrimary} transition-colors duration-300 pb-20 lg:pb-29`}
+      onClick={handleGlobalClick}
+      style={{ touchAction: "pan-y" }}
+    >
       <style>{hideScrollbarStyle}</style>
       {sidebarOpen && (
         <div
@@ -313,16 +366,15 @@ async function toggleFollow(artistId: number) {
 
       <main className="max-w-7xl mx-auto px-6 py-4 space-y-7 lg:space-y-12">
 
-{/* Search (mobile only) */}
-<div className="block lg:hidden">
-  <BrowserSearch isDark={isDark} />
-</div>
-
+        {/* Search (mobile only) */}
+        <div className="block lg:hidden">
+          <BrowserSearch isDark={isDark} />
+        </div>
 
         {/* Large Screen: Featured Playlists and Trending Now in single viewport */}
         <div className="hidden lg:block ">
           <div className="flex flex-col space-y-6">
-          {/* Featured Playlists */}
+            {/* Featured Playlists */}
             <section className={`shrink-0 mb-8 transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
               <div className="flex items-center gap-3 mb-4">
                 <PlayCircle className="w-6 h-6 text-red-600" />
@@ -392,7 +444,8 @@ async function toggleFollow(artistId: number) {
               <div
                 ref={trendingRef}
                 className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
-                style={{ scrollSnapType: "x mandatory" }}
+                // allow horizontal pans for these carousels specifically
+                style={{ scrollSnapType: "x mandatory", touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
               >
                 {trendingSongs.map((song, idx) => {
                   const isCurrentSong = playlist[currentIndex]?.audio === song.audio;
@@ -447,43 +500,40 @@ async function toggleFollow(artistId: number) {
 
         {/* Mobile/Tablet: Original scrollable layout */}
         <div className="lg:hidden space-y-7">
-          {/* Featured Playlists */}
+          {/* Featured Playlists - Mobile Horizontal Scroll */}
+          <section className={`transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+            <div className="flex items-center gap-3 mb-6">
+              <PlayCircle className="w-7 h-7 text-red-600" />
+              <h2 className={`text-2xl font-bold ${textPrimary}`}>Featured Playlists</h2>
+            </div>
 
-
-{/* Featured Playlists - Mobile Horizontal Scroll */}
-<section className={`transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-  <div className="flex items-center gap-3 mb-6">
-    <PlayCircle className="w-7 h-7 text-red-600" />
-    <h2 className={`text-2xl font-bold ${textPrimary}`}>Featured Playlists</h2>
-  </div>
-  
-  <div 
-    className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
-    style={{ scrollSnapType: "x mandatory" }}
-  >
-    {featuredPlaylists.map((playlistItem) => (
-      <div
-        key={playlistItem.id}
-        onMouseEnter={() => setHoveredCard(`playlist-${playlistItem.id}`)}
-        onMouseLeave={() => setHoveredCard(null)}
-        onClick={() => navigateToPlaylist(playlistItem.name)}
-        className={`shrink-0 w-[calc(40%-8px)] group relative ${cardBg} rounded-lg p-4 cursor-pointer transition-all duration-300 ${cardHoverBg} hover:scale-105 hover:shadow-2xl`}
-        style={{ scrollSnapAlign: "start" }}
-      >
-        <div className="w-full aspect-square rounded-md mb-4 overflow-hidden shadow-lg">
-          <img
-            src={playlistItem.image}
-            alt={`${playlistItem.name} artwork`}
-            className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-            loading="lazy"
-          />
-        </div>
-        <h3 className={`font-semibold mb-1 truncate ${textPrimary}`}>{playlistItem.name}</h3>
-        <p className={`text-sm ${textSecondary}`}>{playlistItem.songCount ?? 0} songs</p>
-      </div>
-    ))}
-  </div>
-</section>
+            <div
+              className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
+              style={{ scrollSnapType: "x mandatory", touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
+            >
+              {featuredPlaylists.map((playlistItem) => (
+                <div
+                  key={playlistItem.id}
+                  onMouseEnter={() => setHoveredCard(`playlist-${playlistItem.id}`)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  onClick={() => navigateToPlaylist(playlistItem.name)}
+                  className={`shrink-0 w-[calc(40%-8px)] group relative ${cardBg} rounded-lg p-4 cursor-pointer transition-all duration-300 ${cardHoverBg} hover:scale-105 hover:shadow-2xl`}
+                  style={{ scrollSnapAlign: "start" }}
+                >
+                  <div className="w-full aspect-square rounded-md mb-4 overflow-hidden shadow-lg">
+                    <img
+                      src={playlistItem.image}
+                      alt={`${playlistItem.name} artwork`}
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                  </div>
+                  <h3 className={`font-semibold mb-1 truncate ${textPrimary}`}>{playlistItem.name}</h3>
+                  <p className={`text-sm ${textSecondary}`}>{playlistItem.songCount ?? 0} songs</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* Trending Now */}
           <section className="space-y-6">
@@ -491,7 +541,10 @@ async function toggleFollow(artistId: number) {
               <TrendingUp className="w-8 h-8 text-red-600" />
               <h3 className={`text-2xl font-bold ${textPrimary}`}>Trending Now</h3>
             </div>
-            <div className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar">
+            <div
+              className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
+              style={{ touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
+            >
               {trendingSongs.map((song, idx) => {
                 const isCurrentSong = playlist[currentIndex]?.audio === song.audio;
                 const isThisSongPlaying = isCurrentSong && isPlaying;
@@ -564,9 +617,9 @@ async function toggleFollow(artistId: number) {
           <div
             ref={genresRef}
             className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
-            style={{ scrollSnapType: "x mandatory" }}
+            style={{ scrollSnapType: "x mandatory", touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
           >
-          {genresUI.map((genre, idx) => (
+            {genresUI.map((genre, idx) => (
               <div
                 key={genre.id}
                 onMouseEnter={() => setHoveredCard(`genre-${genre.id}`)}
@@ -600,7 +653,7 @@ async function toggleFollow(artistId: number) {
           </div>
         </section>
 
-      {/* Artist Spotlights (with Follow/Following button) */}
+        {/* Artist Spotlights (with Follow/Following button) */}
         <section className="space-y-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
@@ -627,7 +680,7 @@ async function toggleFollow(artistId: number) {
           <div
             ref={artistsRef}
             className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
-            style={{ scrollSnapType: "x mandatory" }}
+            style={{ scrollSnapType: "x mandatory", touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
           >
             {artistsUI.map((artist) => (
               <div
@@ -666,7 +719,8 @@ async function toggleFollow(artistId: number) {
             ))}
           </div>
         </section>
-       {/* New Releases */}
+
+        {/* New Releases */}
         <section className="space-y-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
@@ -693,7 +747,7 @@ async function toggleFollow(artistId: number) {
           <div
             ref={newReleasesRef}
             className="flex gap-4 overflow-x-auto py-2 px-1 touch-pan-x scroll-smooth hide-scrollbar"
-            style={{ scrollSnapType: "x mandatory" }}
+            style={{ scrollSnapType: "x mandatory", touchAction: "pan-x", WebkitOverflowScrolling: "touch" }}
           >
             {newReleases.map((release, idx) => {
               const isCurrentSong = playlist[currentIndex]?.audio === release.audio;
