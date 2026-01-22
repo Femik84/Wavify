@@ -167,13 +167,13 @@ export default function NowPlaying() {
               alt="Album Art"
               className={`w-full rounded-lg shadow-2xl object-cover ${isDark ? "shadow-black/50" : "shadow-gray-400/25"}`}
               // ensure the poster never grows beyond a reasonable portion of the viewport
-              style={{ maxHeight: "45vh", height: "250px" }}
+              style={{ maxHeight: "45vh", height: "300px" }}
             />
           </div>
         </div>
 
         {/* Track Info & Controls (fixed height region) */}
-        <div className="relative bottom-25 px-6 pb-6 flex-none space-y-5">
+        <div className="relative bottom-20 px-6 pb-6 flex-none space-y-5">
           {/* Track Info */}
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
