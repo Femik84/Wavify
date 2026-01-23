@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+ import { useState, useEffect, useRef } from "react";
 import { Search, Sun, Moon, Menu, Music, User, Folder, Disc } from "lucide-react";
 import { navItems, trackRecentlyPlayed } from "../Data";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -179,6 +179,17 @@ export default function Header({ isDark, setIsDark, setSidebarOpen }: Props) {
     results.artists.length > 0 ||
     results.playlists.length > 0 ||
     results.genres.length > 0;
+
+  // Mobile search handler: navigate to /browse and ensure scroll to top
+  const handleMobileSearch = () => {
+    navigate("/browse");
+    if (typeof window !== "undefined") {
+      // small timeout to ensure navigation happens first in SPA routers that might preserve scroll
+      setTimeout(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      }, 50);
+    }
+  };
 
   return (
     <header
@@ -411,7 +422,7 @@ export default function Header({ isDark, setIsDark, setSidebarOpen }: Props) {
 
           {/* Mobile Search Button - Navigate to browse page */}
           <button
-            onClick={() => navigate('/browse')}
+            onClick={handleMobileSearch}
             className={`md:hidden p-2.5 rounded-full ${cardBg} ${hoverBg} transition shadow-lg`}
             aria-label="Search"
           >
